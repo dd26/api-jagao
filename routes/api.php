@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Controller\ServiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,3 +20,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::post('/login', 'UserController@login');
+
+Route::middleware('auth:api')->resource('/services', 'ServiceController');
+Route::get('/image_test/{id}', 'ServiceController@getImageByServiceId');

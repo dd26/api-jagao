@@ -17,9 +17,8 @@ class UserController extends Controller
             $user->save();
             return response()->json($user);
         } else {
-            return response()->json([
-                'user' => $user
-            ]);
+            // retornar error de usuario no encontrado
+            return response()->json(['error' => 'Usuario no encontrado'], 401);
         }
     }
     /**
