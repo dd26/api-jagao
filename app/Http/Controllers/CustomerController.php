@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Service;
+use App\{Customer, User};
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 
-
-class ServiceController extends Controller
+class CustomerController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,9 +16,9 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        $services = Service::all();
-        foreach ($services as $service) {
-            $service->actions = array(
+        $customers = Customer::all();
+        foreach ($customers as $customer) {
+            $customer->actions = array(
                 [
                     'title' => 'Editar',
                     'url'=> null,
@@ -35,7 +34,7 @@ class ServiceController extends Controller
                 ]
             );
         };
-        return response()->json($services);
+        return response()->json($customers);
     }
 
     /**
@@ -56,20 +55,29 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        $service = new Service();
-        $service->name = $request->input('name');
-        $service->price = $request->input('price');
-        $service->description = $request->input('description');
-        $service->category_id = $request->input('category_id');
-        $service->save();
+        $user = new User();
+        $user->name = $request->input('userName');
+        $user->email = $request->input('email');
+        $user->password = $request->input('password');
+        $user->save();
+
+        $customer = new Customer();
+        $customer->userName = $request->input('userName');
+        $customer->birthDate = $request->input('birthdate');
+        $customer->identification = $request->input('identification');
+        $customer->country_id = $request->input('country_id');
+        $customer->city_id = $request->input('city_id');
+        $customer->address = $request->input('address');
+        $customer->user_id = $user->id;
+        $customer->save();
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $file = $request->image;
             // guardar imagen
-            $file->move(public_path().'/storage/services/'.$service->id, $service->id . '.jpeg');
+            $file->move(public_path().'/storage/customers/'.$customer->id, $customer->id . '.jpeg');
         }
-        return response()->json($service, 200);
+        return response()->json($customer, 200);
     }
 
     /**
@@ -80,7 +88,7 @@ class ServiceController extends Controller
      */
     public function show($id)
     {
-        return Service::findOrFail($id);
+        return Customer::findOrFail($id);
     }
 
     /**
@@ -103,13 +111,22 @@ class ServiceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $service = Service::findOrFail($id);
-        $service->name = $request->input('name');
-        $service->price = $request->input('price');
-        $service->description = $request->input('description');
-        $service->category_id = $request->input('category_id');
-        $service->save();
-        return $service;
+        $user = new User();
+        $user->name = $request->input('userName');
+        $user->email = $request->input('email');
+        $user->password = $request->input('password');
+        $user->save();
+
+        $customer = new Customer();
+        $customer->userName = $request->input('userName');
+        $customer->birthDate = $request->input('birthdate');
+        $customer->identification = $request->input('identification');
+        $customer->country_id = $request->input('country_id');
+        $customer->city_id = $request->input('city_id');
+        $customer->address = $request->input('address');
+        $customer->user_id = $user->id;
+        $customer->save();
+        return response()->json($customer, 200);
     }
 
     /**
@@ -120,8 +137,8 @@ class ServiceController extends Controller
      */
     public function destroy($id)
     {
-        $service = Service::findOrFail($id);
-        $service->delete();
-        return $service;
+        $customer = Customer::findOrFail($id);
+        $customer->delete();
+        return response()->json(['message' => 'Customer deleted successfully'], 201);
     }
 }

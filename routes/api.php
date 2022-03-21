@@ -22,4 +22,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('/login', 'UserController@login');
 
 Route::middleware('auth:api')->resource('/services', 'ServiceController');
-Route::get('/image_test/{id}', 'ServiceController@getImageByServiceId');
+Route::middleware('auth:api')->resource('/customers', 'CustomerController');
+
+Route::get('/image/{folder}/{id}', 'UploadController@getImage');
+Route::post('/image/{folder}/{id}', 'UploadController@changeImage');
