@@ -22,6 +22,7 @@ class CreateSpecialistsTable extends Migration
             $table->integer('country_id');
             $table->integer('city_id');
             $table->string('address');
+            $table->string('identification');
             $table->timestamps();
         });
     }

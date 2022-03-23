@@ -21,6 +21,7 @@ class CreateCustomersTable extends Migration
             $table->date('birthDate');
             $table->integer('country_id');
             $table->integer('city_id');
+            $table->string('identification');
             $table->string('address');
             $table->timestamps();
         });

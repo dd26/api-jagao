@@ -18,6 +18,8 @@ class CustomerController extends Controller
     {
         $customers = Customer::all();
         foreach ($customers as $customer) {
+            $user = $customer->user;
+            $customer->email = $user->email;
             $customer->actions = array(
                 [
                     'title' => 'Editar',
@@ -63,7 +65,7 @@ class CustomerController extends Controller
 
         $customer = new Customer();
         $customer->userName = $request->input('userName');
-        $customer->birthDate = $request->input('birthdate');
+        $customer->birthDate = $request->input('birthDate');
         $customer->identification = $request->input('identification');
         $customer->country_id = $request->input('country_id');
         $customer->city_id = $request->input('city_id');
@@ -88,7 +90,10 @@ class CustomerController extends Controller
      */
     public function show($id)
     {
-        return Customer::findOrFail($id);
+        $customer = Customer::findOrFail($id);
+        $user = $customer->user;
+        $customer->email = $user->email;
+        return response()->json($customer);
     }
 
     /**
@@ -111,21 +116,21 @@ class CustomerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = new User();
+        $customer = Customer::findOrFail($id);
+        $customer->userName = $request->input('userName');
+        $customer->birthDate = $request->input('birthDate');
+        $customer->identification = $request->input('identification');
+        $customer->country_id = $request->input('country_id');
+        $customer->city_id = $request->input('city_id');
+        $customer->address = $request->input('address');
+        $customer->save();
+
+        $user = User::findOrFail($customer->user_id);
         $user->name = $request->input('userName');
         $user->email = $request->input('email');
         $user->password = $request->input('password');
         $user->save();
 
-        $customer = new Customer();
-        $customer->userName = $request->input('userName');
-        $customer->birthDate = $request->input('birthdate');
-        $customer->identification = $request->input('identification');
-        $customer->country_id = $request->input('country_id');
-        $customer->city_id = $request->input('city_id');
-        $customer->address = $request->input('address');
-        $customer->user_id = $user->id;
-        $customer->save();
         return response()->json($customer, 200);
     }
 
@@ -139,6 +144,9 @@ class CustomerController extends Controller
     {
         $customer = Customer::findOrFail($id);
         $customer->delete();
+
+        $user = User::findOrFail($customer->user_id);
+        $user->delete();
         return response()->json(['message' => 'Customer deleted successfully'], 201);
     }
 }
