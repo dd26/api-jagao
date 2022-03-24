@@ -47,6 +47,7 @@ class SpecialistController extends Controller
         $user->name = $request->input('userName');
         $user->email = $request->input('email');
         $user->password = $request->input('password');
+        $user->role_id = 2;
         $user->save();
 
         $specialist = new Specialist();

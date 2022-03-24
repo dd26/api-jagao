@@ -21,6 +21,21 @@ class UserController extends Controller
             return response()->json(['error' => 'Usuario no encontrado'], 401);
         }
     }
+
+
+    public function loginApp (Request $request) {
+        $credentials = $request->only('email', 'password');
+        $user = User::where('email', $request->email)->where('password', $request->password)->first();
+        if ($user && ($user['role_id'] == 2 || $user['role_id'] == 3)) {
+            $user->api_token = Str::random(60);
+            $user->save();
+            return response()->json($user);
+        } else {
+            // retornar error de usuario no encontrado
+            return response()->json(['error' => 'Usuario no encontrado'], 401);
+        }
+    }
+
     /**
      * Display a listing of the resource.
      *

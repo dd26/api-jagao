@@ -18,7 +18,8 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Usuario Prueba',
                 'email' => 'admin@example.com',
-                'password' => '123456789'
+                'password' => '123456789',
+                'role_id' => 1,
             ]
         );
     }
