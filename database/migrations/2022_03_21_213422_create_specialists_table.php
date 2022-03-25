@@ -23,6 +23,8 @@ class CreateSpecialistsTable extends Migration
             $table->integer('city_id');
             $table->string('address');
             $table->string('identification');
+            $table->string('phone')->nullable();
+            $table->string('discountCoupon')->nullable();
             $table->timestamps();
         });
     }

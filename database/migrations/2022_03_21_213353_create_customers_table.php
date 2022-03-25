@@ -22,6 +22,8 @@ class CreateCustomersTable extends Migration
             $table->integer('country_id');
             $table->integer('city_id');
             $table->string('identification');
+            $table->string('phone')->nullable();
+            $table->string('discountCoupon')->nullable();
             $table->string('address');
             $table->timestamps();
         });

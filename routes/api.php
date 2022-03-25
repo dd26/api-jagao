@@ -21,6 +21,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('/login', 'UserController@login');
 Route::post('/login_app', 'UserController@loginApp');
+Route::post('/mail_verify', 'UserController@mailVerify');
+Route::post('/users', 'UserController@storeApp');
 
 Route::middleware('auth:api')->resource('/services', 'ServiceController');
 Route::middleware('auth:api')->resource('/customers', 'CustomerController');
