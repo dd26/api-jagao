@@ -27,6 +27,7 @@ Route::post('/users', 'UserController@storeApp');
 Route::middleware('auth:api')->resource('/services', 'ServiceController');
 Route::middleware('auth:api')->resource('/customers', 'CustomerController');
 Route::middleware('auth:api')->resource('/specialists', 'SpecialistController');
+Route::middleware('auth:api')->resource('/addresses', 'AddressController');
 
 Route::get('/image/{folder}/{id}', 'UploadController@getImage');
 Route::post('/image/{folder}/{id}', 'UploadController@changeImage');

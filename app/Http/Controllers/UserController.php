@@ -55,7 +55,7 @@ class UserController extends Controller
         $data = $request->only('email', 'password', 'userName', 'birthDate', 'city', 'country', 'discountCoupon', 'identification', 'name', 'phone', 'address');
         $isEmployee = $request->input('isEmployee');
         $user = new User();
-        if ($isEmployee) {
+        if ($isEmployee == "true") {
             $user->role_id = 2;
         } else {
             $user->role_id = 3;
