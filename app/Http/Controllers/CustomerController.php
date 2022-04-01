@@ -150,4 +150,9 @@ class CustomerController extends Controller
         $user->delete();
         return response()->json(['message' => 'Customer deleted successfully'], 201);
     }
+
+    public function customerByUserId ($id) {
+        $customer = Customer::where('user_id', $id)->first();
+        return response()->json($customer);
+    }
 }
