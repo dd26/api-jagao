@@ -113,7 +113,7 @@ class SpecialistController extends Controller
         return response()->json($specialist);
     }
 
-    public function profileUpdate ($id)
+    public function profileUpdate (Request $request, $id)
     {
         $specialist = Specialist::findOrFail($id);
         $specialist->userName = $request->input('userName');
@@ -127,8 +127,6 @@ class SpecialistController extends Controller
 
         $user = User::findOrFail($specialist->user_id);
         $user->name = $request->input('name');
-        $user->email = $request->input('email');
-        $user->password = $request->input('password');
         $user->save();
 
         return response()->json($specialist, 200);

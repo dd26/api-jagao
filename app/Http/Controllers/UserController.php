@@ -127,6 +127,20 @@ class UserController extends Controller
         return response()->json($user, 201);
     }
 
+    public function getUserInfo (Request $request)
+    {
+        $user = $request->user();
+        if ($user->role_id == 2) {
+            $specialist = Specialist::where('user_id', $user->id)->first();
+            $specialist->user = $user;
+            return response()->json($specialist);
+        } else if ($user->role_id == 3) {
+            $customer = Customer::where('user_id', $user->id)->first();
+            $customer->user = $user;
+            return response()->json($customer);
+        }
+    }
+
 
 
     /**

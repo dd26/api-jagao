@@ -155,4 +155,23 @@ class CustomerController extends Controller
         $customer = Customer::where('user_id', $id)->first();
         return response()->json($customer);
     }
+
+    public function profileUpdate (Request $request, $id)
+    {
+        $customer = Customer::findOrFail($id);
+        $customer->userName = $request->input('userName');
+        $customer->birthDate = $request->input('birthDate');
+        $customer->identification = $request->input('identification');
+        $customer->country_id = $request->input('country_id');
+        $customer->city_id = $request->input('city_id');
+        $customer->address = $request->input('address');
+        $customer->phone = $request->input('phone');
+        $customer->save();
+
+        $user = User::findOrFail($customer->user_id);
+        $user->name = $request->input('name');
+        $user->save();
+
+        return response()->json($customer, 200);
+    }
 }
