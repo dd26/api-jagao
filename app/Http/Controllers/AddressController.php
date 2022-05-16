@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Address;
+//helpers
+use App\Helpers\Helper;
 
 class AddressController extends Controller
 {
@@ -40,8 +42,18 @@ class AddressController extends Controller
         $address->name = request('name');
         $address->city_id = request('city_id');
         $address->address = request('address');
-        $address->postal_code = request('postal_code');
+        $address->postal_code = request('postalCode');
         $address->save();
+
+        // si tiene imagen la guardo
+        if ($request->hasFile('image')) {
+            if ($request->has('file')) {
+                $path = Helper::uploadImage($request->file, 'address');
+                $address->default_img = $path;
+                $address->save();
+            }
+
+        };
         return response()->json($address);
     }
 
@@ -59,7 +71,7 @@ class AddressController extends Controller
         $address->name = request('name');
         $address->city_id = request('city_id');
         $address->address = request('address');
-        $address->postal_code = request('postal_code');
+        $address->postal_code = request('postalCode');
         $address->save();
         return response()->json($address);
     }
