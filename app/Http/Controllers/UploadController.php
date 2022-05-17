@@ -27,4 +27,15 @@ class UploadController extends Controller
         $image->move(public_path().'/storage/'.$folder.'/'. $id .'/', $id . '.jpeg');
         return Response::json(['success' => 'Imagen cambiada']);
     }
+
+    public function getImageTwo($folder, $name)
+    {
+        $path = public_path().'/storage/'.$folder.'/'. $name;
+        if (file_exists($path)) {
+            return Response::download($path);
+        } else {
+            $none = public_path().'/avatar4.png';
+            return Response::download($none);
+        }
+    }
 }

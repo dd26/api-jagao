@@ -47,9 +47,9 @@ class AddressController extends Controller
 
         // si tiene imagen la guardo
         if ($request->hasFile('image')) {
-            if ($request->has('file')) {
-                $path = Helper::uploadImage($request->file, 'address');
-                $address->default_img = $path;
+            if ($request->has('image')) {
+                $path = Helper::uploadImage($request->image, 'address');
+                $address->default_name_image = $path;
                 $address->save();
             }
 
@@ -80,6 +80,10 @@ class AddressController extends Controller
     {
         $address = Address::find($id);
         $address->delete();
+        // eliminar la imagen si existe
+        if ($address->default_name_image) {
+            Helper::deleteFile($address->default_name_image, 'address');
+        }
         return response()->json($address);
     }
 }
