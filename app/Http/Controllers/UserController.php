@@ -9,6 +9,14 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    public function changeStatus(Request $request)
+    {
+        $user = Auth::user();
+        $user->status = $request->status;
+        $user->save();
+        return response()->json(['status' => 'success']);
+    }
+
     public function login(Request $request) {
         $credentials = $request->only('email', 'password');
         $user = User::where('email', $request->email)->where('password', $request->password)->first();

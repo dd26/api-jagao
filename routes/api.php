@@ -36,6 +36,8 @@ Route::middleware('auth:api')->resource('/addresses', 'AddressController');
 Route::middleware('auth:api')->resource('/cards', 'CardController');
 Route::middleware('auth:api')->resource('/banks', 'BankController');
 
+Route::put('/users/change_status', 'UserController@changeStatus')->middleware('auth:api');
+
 Route::get('/image/{folder}/{id}', 'UploadController@getImage');
 Route::get('/image_two/{folder}/{name}', 'UploadController@getImageTwo');
 Route::post('/image/{folder}/{id}', 'UploadController@changeImage');
