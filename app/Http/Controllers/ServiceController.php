@@ -66,7 +66,6 @@ class ServiceController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $file = $request->image;
-            // guardar imagen
             $file->move(public_path().'/storage/services/'.$service->id, $service->id . '.jpeg');
         }
         return response()->json($service, 200);

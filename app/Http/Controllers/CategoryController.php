@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Category;
+use App\Helpers\Helper;
+use File;
 
 class CategoryController extends Controller
 {
@@ -15,6 +17,23 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::all();
+        foreach ($categories as $item) {
+            $item->actions = array(
+                [
+                    'title' => 'Editar',
+                    'url'=> null,
+                    'action' => 'edit',
+                    'icon' => 'img:vectors/edit4.png',
+                    'color' => 'primary'
+                ],
+                [
+                    'title' => 'Eliminar',
+                    'url'=> null,
+                    'action' => 'delete',
+                    'icon' => 'img:vectors/trash1.png',
+                ]
+            );
+        };
         return response()->json($categories);
     }
 
@@ -36,7 +55,15 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $category = new Category;
+        $category->name = $request->name;
+        $category->save();
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $file = $request->image;
+            $file->move(public_path().'/storage/categories/'.$category->id, $category->id . '.jpeg');
+        }
+        return response()->json($category);
     }
 
     /**
@@ -47,7 +74,8 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        //
+        $category = Category::find($id);
+        return response()->json($category);
     }
 
     /**
@@ -70,7 +98,15 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $category = Category::find($id);
+        $category->name = $request->name;
+        $category->save();
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $file = $request->image;
+            $file->move(public_path().'/storage/categories/'.$category->id, $category->id . '.jpeg');
+        }
+        return response()->json($category);
     }
 
     /**
@@ -81,6 +117,13 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $category = Category::findOrFail($id);
+        $category->delete();
+
+        $file = public_path('storage/categories/'.$category->id.'/'.$category->id . '.jpeg');
+        if (File::exists($file)) {
+            unlink($file);
+        }
+        return response()->json($category);
     }
 }

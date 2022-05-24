@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Address;
-//helpers
 use App\Helpers\Helper;
 
 class AddressController extends Controller

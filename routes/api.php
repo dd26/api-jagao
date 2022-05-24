@@ -36,6 +36,7 @@ Route::middleware('auth:api')->resource('/addresses', 'AddressController');
 Route::middleware('auth:api')->resource('/cards', 'CardController');
 Route::middleware('auth:api')->resource('/banks', 'BankController');
 Route::middleware('auth:api')->resource('/categories', 'CategoryController');
+Route::middleware('auth:api')->resource('/subcategories', 'SubCategoryController');
 
 Route::put('/users/change_status', 'UserController@changeStatus')->middleware('auth:api');
 
