@@ -36,7 +36,11 @@ Route::middleware('auth:api')->resource('/addresses', 'AddressController');
 Route::middleware('auth:api')->resource('/cards', 'CardController');
 Route::middleware('auth:api')->resource('/banks', 'BankController');
 Route::middleware('auth:api')->resource('/categories', 'CategoryController');
+
 Route::middleware('auth:api')->resource('/subcategories', 'SubCategoryController');
+Route::get('/subcategories_by_category_id/{id}', 'SubCategoryController@subcategoriesByCategoryId')->middleware('auth:api');
+
+Route::post('/specialist_services', 'SpecialistServiceController@store')->middleware('auth:api');
 
 Route::put('/users/change_status', 'UserController@changeStatus')->middleware('auth:api');
 

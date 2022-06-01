@@ -10,6 +10,13 @@ use File;
 
 class SubCategoryController extends Controller
 {
+
+    public function subcategoriesByCategoryId($id)
+    {
+        $subcategories = SubCategory::where('category_id', $id)->get();
+        return response()->json($subcategories);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -63,6 +70,7 @@ class SubCategoryController extends Controller
         $subcategory->category_id = $request->category_id;
         $subcategory->description = $request->description;
         $subcategory->has_document = $request->has_document;
+        $subcategory->price = $request->price;
         $subcategory->save();
 
         if ($request->hasFile('image')) {
@@ -110,6 +118,7 @@ class SubCategoryController extends Controller
         $subcategory->category_id = $request->category_id;
         $subcategory->description = $request->description;
         $subcategory->has_document = $request->has_document;
+        $subcategory->price = $request->price;
         $subcategory->save();
 
         if ($request->hasFile('image')) {

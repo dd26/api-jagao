@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSubcategories extends Migration
+class CreateSpecialistServices extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,15 @@ class CreateSubcategories extends Migration
      */
     public function up()
     {
-        Schema::create('subcategories', function (Blueprint $table) {
+        Schema::create('specialist_services', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description')->nullable();
             $table->unsignedBigInteger('category_id');
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-            $table->boolean('has_document')->default(false);
+            $table->string('category_name')->nullable();
+            $table->unsignedBigInteger('subcategory_id');
+            $table->string('subcategory_name')->nullable();
+            $table->unsignedBigInteger('user_id');
             $table->decimal('price', 8, 2)->nullable();
+            $table->boolean('has_document')->default(false);
             $table->timestamps();
         });
     }
@@ -32,6 +33,6 @@ class CreateSubcategories extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('subcategories');
+        Schema::dropIfExists('specialist_services');
     }
 }
