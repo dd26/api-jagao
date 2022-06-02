@@ -21,6 +21,8 @@ Route::post('/login', 'UserController@login');
 Route::post('/login_app', 'UserController@loginApp');
 Route::post('/mail_verify', 'UserController@mailVerify');
 Route::post('/users', 'UserController@storeApp');
+// verifyToken
+Route::post('/verify_token', 'UserController@verifyToken');
 
 Route::middleware('auth:api')->resource('/services', 'ServiceController');
 
@@ -41,8 +43,12 @@ Route::middleware('auth:api')->resource('/subcategories', 'SubCategoryController
 Route::get('/subcategories_by_category_id/{id}', 'SubCategoryController@subcategoriesByCategoryId')->middleware('auth:api');
 
 Route::post('/specialist_services', 'SpecialistServiceController@store')->middleware('auth:api');
+Route::get('/specialist_services', 'SpecialistServiceController@index')->middleware('auth:api');
+Route::get('/specialist_services/category/{category_id}', 'SpecialistServiceController@specialistServicesByCategory')->middleware('auth:api');
 
 Route::put('/users/change_status', 'UserController@changeStatus')->middleware('auth:api');
+
+Route::get('/cities', 'CityController@index');
 
 Route::get('/image/{folder}/{id}', 'UploadController@getImage');
 Route::get('/image_two/{folder}/{name}', 'UploadController@getImageTwo');

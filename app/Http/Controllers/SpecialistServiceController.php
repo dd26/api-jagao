@@ -14,9 +14,19 @@ class SpecialistServiceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $user_id = $request->user()->id;
+        $specialist_services = SpecialistService::where('user_id', $user_id)->get();
+        $categories = $specialist_services->groupBy('category_id');
+        return response()->json($categories);
+    }
+
+    public function specialistServicesByCategory(Request $request, $category_id)
+    {
+        $user_id = $request->user()->id;
+        $specialist_services = SpecialistService::where('user_id', $user_id)->where('category_id', $category_id)->get();
+        return response()->json($specialist_services);
     }
 
     /**
@@ -47,7 +57,8 @@ class SpecialistServiceController extends Controller
             $subcategory = SubCategory::find($subcategoryItem->id);
             // busco la categoria
             $category = Category::find($subcategory->category_id);
-            // creo el servicio
+            // creo el servicio o actualizo
+
             $specialistService = new SpecialistService();
             $specialistService->category_id = $category->id;
             $specialistService->category_name = $category->name;

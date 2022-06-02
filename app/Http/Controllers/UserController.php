@@ -9,6 +9,17 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+
+    public function verifyToken (Request $request)
+    {
+        $user = User::where('api_token', $request->api_token)->first();
+        if ($user) {
+            return response()->json(['status' => 'success', 'user' => $user]);
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Token invalido']);
+        }
+    }
+
     public function changeStatus(Request $request)
     {
         $user = Auth::user();
@@ -60,7 +71,7 @@ class UserController extends Controller
     }
 
     public function storeApp (Request $request) {
-        $data = $request->only('email', 'password', 'userName', 'birthDate', 'city', 'country', 'discountCoupon', 'identification', 'name', 'phone', 'address');
+        $data = $request->only('email', 'password', 'userName', 'birthDate', 'city', 'country', 'discountCoupon', 'identification', 'name', 'phone', 'address', 'zip_code');
         $isEmployee = $request->input('isEmployee');
         $user = new User();
         if ($isEmployee == "true") {
@@ -83,6 +94,7 @@ class UserController extends Controller
             $specialist->address = $data['address'];
             $specialist->discountCoupon = $data['discountCoupon'];
             $specialist->phone = $data['phone'];
+            $specialist->zip_code = $data['zip_code'];
             $specialist->user_id = $user->id;
             $specialist->save();
         } else {
@@ -95,6 +107,7 @@ class UserController extends Controller
             $customer->address = $data['address'];
             $customer->discountCoupon = $data['discountCoupon'];
             $customer->phone = $data['phone'];
+            $customer->zip_code = $data['zip_code'];
             $customer->user_id = $user->id;
             $customer->save();
         }
