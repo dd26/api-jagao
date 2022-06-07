@@ -49,6 +49,7 @@ Route::get('/specialist_services/category/{category_id}', 'SpecialistServiceCont
 Route::put('/users/change_status', 'UserController@changeStatus')->middleware('auth:api');
 
 Route::get('/cities', 'CityController@index');
+Route::get('/categories', 'CategoryController@index');
 
 Route::get('/image/{folder}/{id}', 'UploadController@getImage');
 Route::get('/image_two/{folder}/{name}', 'UploadController@getImageTwo');
