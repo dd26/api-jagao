@@ -10,8 +10,6 @@ class SpecialistService extends Model
     protected $fillable = [
         'category_id',
         'category_name',
-        'subcategory_id',
-        'subcategory_name',
         'user_id',
         'price',
         'has_document',

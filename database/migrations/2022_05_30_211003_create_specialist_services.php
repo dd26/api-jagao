@@ -17,8 +17,6 @@ class CreateSpecialistServices extends Migration
             $table->id();
             $table->unsignedBigInteger('category_id');
             $table->string('category_name')->nullable();
-            $table->unsignedBigInteger('subcategory_id');
-            $table->string('subcategory_name')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->decimal('price', 8, 2)->nullable();
             $table->boolean('has_document')->default(false);

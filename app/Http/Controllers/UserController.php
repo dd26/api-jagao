@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\{ User, Customer, Specialist };
+use App\{ User, Customer, Specialist, SpecialistService, Category };
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
@@ -49,14 +49,12 @@ class UserController extends Controller
             $user->save();
             return response()->json($user);
         } else {
-            // retornar error de usuario no encontrado
             return response()->json(['error' => 'Usuario no encontrado'], 401);
         }
     }
 
     public function mailVerify (Request $request) {
         $user = User::where('email', $request->email)->first();
-        // return response()->json($request->email);
         if ($user) {
             return response()->json([
                 'message' => 'El correo ya esta registrado, intente con otro.',
@@ -71,7 +69,7 @@ class UserController extends Controller
     }
 
     public function storeApp (Request $request) {
-        $data = $request->only('email', 'password', 'userName', 'birthDate', 'city', 'country', 'discountCoupon', 'identification', 'name', 'phone', 'address', 'zip_code');
+        $data = $request->only('email', 'password', 'userName', 'birthDate', 'city', 'country', 'discountCoupon', 'identification', 'name', 'phone', 'address', 'zip_code', 'category_id');
         $isEmployee = $request->input('isEmployee');
         $user = new User();
         if ($isEmployee == "true") {
@@ -97,6 +95,15 @@ class UserController extends Controller
             $specialist->zip_code = $data['zip_code'];
             $specialist->user_id = $user->id;
             $specialist->save();
+            // save category
+            $category = Category::find($data['category_id']);
+            $specialistService = new SpecialistService();
+            $specialistService->category_id = $data['category_id'];
+            $specialistService->user_id = $user->id;
+            $specialistService->category_name = $category->name;
+            $specialistService->price = 0;
+            $specialistService->has_document = 0;
+            $specialistService->save();
         } else {
             $customer = new Customer();
             $customer->userName = $data['userName'];
@@ -134,7 +141,7 @@ class UserController extends Controller
             }
         }
 
-        if ($request->hasFile('fileID')) {
+        /* if ($request->hasFile('fileID')) {
             $file = $request->file('fileID');
             $file = $request->fileID;
             // guardar imagen
@@ -143,7 +150,7 @@ class UserController extends Controller
             } else {
                 $file->move(public_path().'/storage/customers/'.$customer->id, 'my_identification' . '.jpeg');
             }
-        }
+        } */
 
         return response()->json($user, 201);
     }
