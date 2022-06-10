@@ -8,9 +8,11 @@ use App\Helpers\Helper;
 
 class AddressController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $addresses = Address::all();
+        // $addresses = Address::all();
+        // traer direcciones por usuario
+        $addresses = Address::where('user_id', $request->user()->id)->get();
         foreach ($addresses as $address) {
             $user = $address->user;
             $address->user = $user;
