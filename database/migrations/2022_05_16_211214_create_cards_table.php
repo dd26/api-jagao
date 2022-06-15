@@ -19,7 +19,7 @@ class CreateCardsTable extends Migration
             $table->string('number');
             $table->string('expiration_date');
             $table->string('cvv');
-            $table->string('postal_code');
+            $table->string('postal_code')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
