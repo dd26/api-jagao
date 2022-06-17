@@ -22,4 +22,13 @@ class MasterRequestService extends Model
         'date_request'
     ];
 
+    public function address()
+    {
+        return $this->belongsTo('App\Address');
+    }
+
+    public function detailRequestService()
+    {
+        return $this->hasMany('App\DetailRequestService');
+    }
 }

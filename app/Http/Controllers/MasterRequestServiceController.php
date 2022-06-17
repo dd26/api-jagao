@@ -53,7 +53,12 @@ class MasterRequestServiceController extends Controller
             $detailRequestService->master_request_service_id = $masterRequestService->id;
             $detailRequestService->service_id = $service['id'];
             $detailRequestService->service_name = $service['name'];
-            $detailRequestService->service_description = $service['description'];
+
+            if ($service['description']) {
+                $detailRequestService->service_description = $service['description'];
+            } else {
+                $detailRequestService->service_description = '';
+            }
 
             $subCategory = SubCategory::find($service['id']);
             $detailRequestService->service_price = $subCategory->price;
@@ -62,5 +67,42 @@ class MasterRequestServiceController extends Controller
             $detailRequestService->save();
         }
         return response()->json(['message' => 'Solicitud de servicio creada correctamente'], 200);
+    }
+
+    // index de solicitudes de servicios por user id
+    public function index(Request $request)
+    {
+        $user = $request->user();
+        $masterRequestServices = MasterRequestService::where('user_id', $user->id)->where('state', 0)->get();
+        foreach ($masterRequestServices as $masterRequestService) {
+            $masterRequestService->address_name = $masterRequestService->address->name;
+            $total = 0;
+            foreach ($masterRequestService->detailRequestService as $detailRequestService) {
+                $total += $detailRequestService->service_price * $detailRequestService->quantity;
+            }
+            $masterRequestService->total = $total;
+        }
+        return response()->json($masterRequestServices, 200);
+    }
+
+    // show
+    public function show(Request $request, $id)
+    {
+        $masterRequestService = MasterRequestService::find($id);
+        $masterRequestService->address_name = $masterRequestService->address->name;
+        $total = 0;
+        foreach ($masterRequestService->detailRequestService as $detailRequestService) {
+            $total += $detailRequestService->service_price * $detailRequestService->quantity;
+        }
+        $masterRequestService->total = $total;
+        return response()->json($masterRequestService, 200);
+    }
+
+    // destroy
+    public function destroy(Request $request, $id)
+    {
+        $masterRequestService = MasterRequestService::find($id);
+        $masterRequestService->delete();
+        return response()->json(['message' => 'Solicitud de servicio eliminada correctamente'], 200);
     }
 }

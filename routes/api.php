@@ -48,8 +48,11 @@ Route::get('/specialist_services/category/{category_id}', 'SpecialistServiceCont
 
 Route::put('/users/change_status', 'UserController@changeStatus')->middleware('auth:api');
 
-// master request services
+
 Route::post('/master_request_services', 'MasterRequestServiceController@store')->middleware('auth:api');
+Route::get('/master_request_services', 'MasterRequestServiceController@index')->middleware('auth:api');
+Route::get('/master_request_services/{id}', 'MasterRequestServiceController@show')->middleware('auth:api');
+Route::delete('/master_request_services/{id}', 'MasterRequestServiceController@destroy')->middleware('auth:api');
 
 
 Route::get('/cities', 'CityController@index');
