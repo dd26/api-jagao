@@ -69,7 +69,6 @@ class MasterRequestServiceController extends Controller
         return response()->json(['message' => 'Solicitud de servicio creada correctamente'], 200);
     }
 
-    // index de solicitudes de servicios por user id
     public function index(Request $request)
     {
         $user = $request->user();
@@ -85,7 +84,23 @@ class MasterRequestServiceController extends Controller
         return response()->json($masterRequestServices, 200);
     }
 
-    // show
+    //index by status
+    public function indexByStatus(Request $request, $status)
+    {
+        $user = $request->user();
+        $masterRequestServices = MasterRequestService::where('state', $status)->get();
+        foreach ($masterRequestServices as $masterRequestService) {
+            $masterRequestService->address_name = $masterRequestService->address->name;
+            $total = 0;
+            foreach ($masterRequestService->detailRequestService as $detailRequestService) {
+                $total += $detailRequestService->service_price * $detailRequestService->quantity;
+            }
+            $masterRequestService->total = $total;
+        }
+        return response()->json($masterRequestServices, 200);
+    }
+
+
     public function show(Request $request, $id)
     {
         $masterRequestService = MasterRequestService::find($id);
@@ -98,11 +113,22 @@ class MasterRequestServiceController extends Controller
         return response()->json($masterRequestService, 200);
     }
 
-    // destroy
+
     public function destroy(Request $request, $id)
     {
         $masterRequestService = MasterRequestService::find($id);
         $masterRequestService->delete();
         return response()->json(['message' => 'Solicitud de servicio eliminada correctamente'], 200);
+    }
+
+    public function updateStatus(Request $request, $id, $status)
+    {
+        $masterRequestService = MasterRequestService::find($id);
+        $masterRequestService->state = $status;
+        if ($status == 1) {
+            $masterRequestService->employee_id = $request->user()->id;
+        }
+        $masterRequestService->save();
+        return response()->json(['message' => 'Solicitud de servicio actualizada correctamente'], 200);
     }
 }
