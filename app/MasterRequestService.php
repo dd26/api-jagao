@@ -31,4 +31,9 @@ class MasterRequestService extends Model
     {
         return $this->hasMany('App\DetailRequestService');
     }
+
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
 }

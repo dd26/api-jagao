@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\{ Card, MasterRequestService, DetailRequestService, Address, Category, SubCategory };
-
+use App\{ Card, MasterRequestService, DetailRequestService, Address, Category, SubCategory, Specialist, Notification, Customer };
+use App\Helpers\Helper;
 
 class MasterRequestServiceController extends Controller
 {
@@ -110,6 +110,11 @@ class MasterRequestServiceController extends Controller
             $total += $detailRequestService->service_price * $detailRequestService->quantity;
         }
         $masterRequestService->total = $total;
+        $masterRequestService->user = $masterRequestService->user;
+        $customer = Customer::where('user_id', $masterRequestService->user_id)->first();
+        $masterRequestService->customer = $customer;
+        $specialist = Specialist::where('user_id', $masterRequestService->employee_id)->first();
+        $masterRequestService->specialist = $specialist;
         return response()->json($masterRequestService, 200);
     }
 
@@ -127,6 +132,14 @@ class MasterRequestServiceController extends Controller
         $masterRequestService->state = $status;
         if ($status == 1) {
             $masterRequestService->employee_id = $request->user()->id;
+            $estimateTime = $request->time;
+            Helper::generateNotification(
+                $request->user()->name.' has accepted your request for services.',
+                'She will be at your house in approximately ' . $estimateTime,
+                1,
+                $masterRequestService->user_id,
+                $masterRequestService->id,
+            );
         }
         $masterRequestService->save();
         return response()->json(['message' => 'Solicitud de servicio actualizada correctamente'], 200);
