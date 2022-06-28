@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\{Specialist, User};
+use App\{Specialist, User, MasterRequestService, DetailRequestService};
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 
@@ -130,5 +130,20 @@ class SpecialistController extends Controller
         $user->save();
 
         return response()->json($specialist, 200);
+    }
+
+    public function getAmountFinish (Request $request)
+    {
+        $masterRequestService = MasterRequestService::where('employee_id', $request->user()->id)->where('state', 2)->get();
+        $amount = 0;
+        foreach ($masterRequestService as $masterRequest) {
+            $detailRequestService = $masterRequest->detailRequestService;
+            foreach ($detailRequestService as $detailRequest) {
+                $amount += $detailRequest->service_price * $detailRequest->quantity;
+            }
+        }
+        // mostrar decimales
+        $amount = number_format($amount, 2, '.', ',');
+        return response()->json($amount);
     }
 }

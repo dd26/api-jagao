@@ -33,6 +33,7 @@ Route::get('/customer_by_user_id/{id}', 'CustomerController@customerByUserId')->
 Route::middleware('auth:api')->resource('/specialists', 'SpecialistController');
 Route::get('/specialist_by_user_id/{id}', 'SpecialistController@specialistByUserId')->middleware('auth:api');
 Route::put('/specialists/profile/{id}', 'SpecialistController@profileUpdate')->middleware('auth:api');
+Route::get('/specialists/amount/total', 'SpecialistController@getAmountFinish')->middleware('auth:api');
 
 Route::middleware('auth:api')->resource('/addresses', 'AddressController');
 Route::middleware('auth:api')->resource('/cards', 'CardController');
@@ -48,7 +49,6 @@ Route::get('/specialist_services/category/{category_id}', 'SpecialistServiceCont
 
 Route::put('/users/change_status', 'UserController@changeStatus')->middleware('auth:api');
 
-
 Route::post('/master_request_services', 'MasterRequestServiceController@store')->middleware('auth:api');
 Route::get('/master_request_services', 'MasterRequestServiceController@index')->middleware('auth:api');
 Route::get('/master_request_services/{id}', 'MasterRequestServiceController@show')->middleware('auth:api');
@@ -57,6 +57,8 @@ Route::get('/master_request_services/status/{status}', 'MasterRequestServiceCont
 Route::put('/master_request_services/{id}/status/{status}', 'MasterRequestServiceController@updateStatus')->middleware('auth:api');
 Route::get('/master_request_services/status/{status}/customer', 'MasterRequestServiceController@indexByStatusAndCustomer')->middleware('auth:api');
 Route::get('/master_request_services/status/{status}/specialist', 'MasterRequestServiceController@indexByStatusAndSpecialist')->middleware('auth:api');
+
+
 
 Route::get('/notifications', 'NotificationController@index')->middleware('auth:api');
 
