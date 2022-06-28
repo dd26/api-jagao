@@ -55,6 +55,8 @@ Route::get('/master_request_services/{id}', 'MasterRequestServiceController@show
 Route::delete('/master_request_services/{id}', 'MasterRequestServiceController@destroy')->middleware('auth:api');
 Route::get('/master_request_services/status/{status}', 'MasterRequestServiceController@indexByStatus')->middleware('auth:api');
 Route::put('/master_request_services/{id}/status/{status}', 'MasterRequestServiceController@updateStatus')->middleware('auth:api');
+Route::get('/master_request_services/status/{status}/customer', 'MasterRequestServiceController@indexByStatusAndCustomer')->middleware('auth:api');
+Route::get('/master_request_services/status/{status}/specialist', 'MasterRequestServiceController@indexByStatusAndSpecialist')->middleware('auth:api');
 
 Route::get('/notifications', 'NotificationController@index')->middleware('auth:api');
 

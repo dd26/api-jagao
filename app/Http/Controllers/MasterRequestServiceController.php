@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\{ Card, MasterRequestService, DetailRequestService, Address, Category, SubCategory, Specialist, Notification, Customer };
+use App\{ Card, MasterRequestService, DetailRequestService, Address, Category, SubCategory, Specialist, Notification, Customer, User };
 use App\Helpers\Helper;
 
 class MasterRequestServiceController extends Controller
@@ -100,6 +100,36 @@ class MasterRequestServiceController extends Controller
         return response()->json($masterRequestServices, 200);
     }
 
+    public function indexByStatusAndCustomer(Request $request, $status)
+    {
+        $user = $request->user();
+        $masterRequestServices = MasterRequestService::where('user_id', $user->id)->where('state', $status)->get();
+        foreach ($masterRequestServices as $masterRequestService) {
+            $masterRequestService->address_name = $masterRequestService->address->name;
+            $total = 0;
+            foreach ($masterRequestService->detailRequestService as $detailRequestService) {
+                $total += $detailRequestService->service_price * $detailRequestService->quantity;
+            }
+            $masterRequestService->total = $total;
+        }
+        return response()->json($masterRequestServices, 200);
+    }
+
+    public function indexByStatusAndSpecialist(Request $request, $status)
+    {
+        $user = $request->user();
+        $masterRequestServices = MasterRequestService::where('employee_id', $user->id)->where('state', $status)->get();
+        foreach ($masterRequestServices as $masterRequestService) {
+            $masterRequestService->address_name = $masterRequestService->address->name;
+            $total = 0;
+            foreach ($masterRequestService->detailRequestService as $detailRequestService) {
+                $total += $detailRequestService->service_price * $detailRequestService->quantity;
+            }
+            $masterRequestService->total = $total;
+        }
+        return response()->json($masterRequestServices, 200);
+    }
+
 
     public function show(Request $request, $id)
     {
@@ -114,7 +144,13 @@ class MasterRequestServiceController extends Controller
         $customer = Customer::where('user_id', $masterRequestService->user_id)->first();
         $masterRequestService->customer = $customer;
         $specialist = Specialist::where('user_id', $masterRequestService->employee_id)->first();
-        $masterRequestService->specialist = $specialist;
+        if ($specialist) {
+            $masterRequestService->specialist = $specialist;
+            $user_specialist = User::find($specialist->user_id);
+            $masterRequestService->specialist->user = $user_specialist;
+        } else {
+            $masterRequestService->specialist = null;
+        }
         return response()->json($masterRequestService, 200);
     }
 
