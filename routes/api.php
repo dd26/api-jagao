@@ -21,7 +21,7 @@ Route::post('/login', 'UserController@login');
 Route::post('/login_app', 'UserController@loginApp');
 Route::post('/mail_verify', 'UserController@mailVerify');
 Route::post('/users', 'UserController@storeApp');
-// verifyToken
+
 Route::post('/verify_token', 'UserController@verifyToken');
 
 Route::middleware('auth:api')->resource('/services', 'ServiceController');
@@ -40,6 +40,9 @@ Route::middleware('auth:api')->resource('/cards', 'CardController');
 Route::middleware('auth:api')->resource('/banks', 'BankController');
 Route::middleware('auth:api')->resource('/categories', 'CategoryController');
 
+Route::middleware('auth:api')->resource('/coupons', 'CouponController');
+Route::put('/coupons/{id}/status/{status}', 'CouponController@updateStatus')->middleware('auth:api');
+
 Route::middleware('auth:api')->resource('/subcategories', 'SubCategoryController');
 Route::get('/subcategories_by_category_id/{id}', 'SubCategoryController@subcategoriesByCategoryId')->middleware('auth:api');
 
@@ -57,8 +60,6 @@ Route::get('/master_request_services/status/{status}', 'MasterRequestServiceCont
 Route::put('/master_request_services/{id}/status/{status}', 'MasterRequestServiceController@updateStatus')->middleware('auth:api');
 Route::get('/master_request_services/status/{status}/customer', 'MasterRequestServiceController@indexByStatusAndCustomer')->middleware('auth:api');
 Route::get('/master_request_services/status/{status}/specialist', 'MasterRequestServiceController@indexByStatusAndSpecialist')->middleware('auth:api');
-
-
 
 Route::get('/notifications', 'NotificationController@index')->middleware('auth:api');
 
