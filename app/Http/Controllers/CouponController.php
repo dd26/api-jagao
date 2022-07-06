@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Coupon;
+use App\Helpers\Helper;
 
 class CouponController extends Controller
 {
@@ -166,5 +167,10 @@ class CouponController extends Controller
         $coupon->status = $status;
         $coupon->save();
         return response()->json($coupon);
+    }
+
+    public function checkCouponByCode ($code) {
+        $verifyCoupon = Helper::checkCoupon($code);
+        return response()->json($verifyCoupon);
     }
 }

@@ -2,7 +2,7 @@
 namespace App\Helpers;
 use File;
 
-use App\Notification;
+use App\{ Notification, Coupon, CouponUse, SubCategory };
 
 
 
@@ -35,5 +35,34 @@ class Helper {
             $notification->master_request_service_id = $master_request_service_id;
         }
         $notification->save();
+    }
+
+
+    public static function checkCoupon($code) {
+        $coupon = Coupon::where('code', $code)->first();
+        if ($coupon) {
+            if ($coupon->status == 1 && $coupon->expiry_date > date('Y-m-d')) {
+                $coupon_uses = CouponUse::where('coupon_id', $coupon->id)->get();
+                $limit = $coupon->limit / $coupon->value;
+                if ($coupon_uses->count() < $limit) {
+                    return $coupon;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public static function getTotalByServices($services) {
+        $total = 0;
+        foreach ($services as $service) {
+            $subCategory = SubCategory::find($service['id']);
+            $total += $subCategory->price * $service['quantity'];
+        }
+        return $total;
     }
 }

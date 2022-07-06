@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\{ Card, MasterRequestService, DetailRequestService, Address, Category, SubCategory, Specialist, Notification, Customer, User };
+use App\{ Card, MasterRequestService, DetailRequestService, Address, Category, SubCategory, Specialist, Notification, Customer, User, Coupon, CouponUse };
 use App\Helpers\Helper;
 
 class MasterRequestServiceController extends Controller
@@ -30,8 +30,24 @@ class MasterRequestServiceController extends Controller
         $masterRequestService->state = 0;
         $masterRequestService->discount = $request->discount;
 
-        if ($request->discount) {
-            $masterRequestService->discount_amount = $request->discount_amount;
+        if ($request->discount === 0) { // 0 = apply discount
+            $code = $request->coupon;
+            $verifyCoupon = Helper::checkCoupon($code);
+            if ($verifyCoupon) {
+                $masterRequestService->discount = 1;
+                if ($verifyCoupon->type === 1) {
+                    $totalAmount = Helper::getTotalByServices($request->services);
+                    $discountAmount = $totalAmount * ($verifyCoupon->value / 100);
+                } else {
+                    $discountAmount = $verifyCoupon->value;
+                }
+                $masterRequestService->discount_amount = $discountAmount;
+            } else {
+                return response()->json([
+                    'error' => true,
+                    'message' => 'Coupon not valid'
+                ], 200);
+            }
         } else {
             $masterRequestService->discount_amount = 0;
         }
@@ -46,6 +62,14 @@ class MasterRequestServiceController extends Controller
         }
 
         $masterRequestService->save();
+
+        // save coupon uses
+        if ($masterRequestService->discount === 1) {
+            $couponUse = new CouponUse;
+            $couponUse->coupon_id = $verifyCoupon->id;
+            $couponUse->master_request_service_id = $masterRequestService->id;
+            $couponUse->save();
+        }
 
         $services = $request->services;
         foreach ($services as $service) {
@@ -66,7 +90,7 @@ class MasterRequestServiceController extends Controller
 
             $detailRequestService->save();
         }
-        return response()->json(['message' => 'Solicitud de servicio creada correctamente'], 200);
+        return response()->json(['message' => 'success'], 200);
     }
 
     public function index(Request $request)
@@ -177,6 +201,17 @@ class MasterRequestServiceController extends Controller
                 $masterRequestService->id,
             );
         }
+
+        if ($status == 2) {
+            Helper::generateNotification(
+                $request->user()->name. ' has marked the service as finished',
+                'press to go to the service and rate the service provider',
+                1,
+                $masterRequestService->user_id,
+                $masterRequestService->id,
+            );
+        }
+
         $masterRequestService->save();
         return response()->json(['message' => 'Solicitud de servicio actualizada correctamente'], 200);
     }

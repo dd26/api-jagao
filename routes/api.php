@@ -42,6 +42,7 @@ Route::middleware('auth:api')->resource('/categories', 'CategoryController');
 
 Route::middleware('auth:api')->resource('/coupons', 'CouponController');
 Route::put('/coupons/{id}/status/{status}', 'CouponController@updateStatus')->middleware('auth:api');
+Route::get('/coupons/check/code/{code}', 'CouponController@checkCouponByCode')->middleware('auth:api');
 
 Route::middleware('auth:api')->resource('/subcategories', 'SubCategoryController');
 Route::get('/subcategories_by_category_id/{id}', 'SubCategoryController@subcategoriesByCategoryId')->middleware('auth:api');
@@ -62,6 +63,10 @@ Route::get('/master_request_services/status/{status}/customer', 'MasterRequestSe
 Route::get('/master_request_services/status/{status}/specialist', 'MasterRequestServiceController@indexByStatusAndSpecialist')->middleware('auth:api');
 
 Route::get('/notifications', 'NotificationController@index')->middleware('auth:api');
+
+// calification
+Route::post('/califications/{master_request_service_id}', 'CalificationController@store')->middleware('auth:api');
+Route::get('/califications/{master_request_service_id}', 'CalificationController@show')->middleware('auth:api');
 
 Route::get('/cities', 'CityController@index');
 Route::get('/categories', 'CategoryController@index');
