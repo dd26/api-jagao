@@ -36,6 +36,8 @@ Route::put('/specialists/profile/{id}', 'SpecialistController@profileUpdate')->m
 Route::get('/specialists/amount/total', 'SpecialistController@getAmountFinish')->middleware('auth:api');
 
 Route::middleware('auth:api')->resource('/addresses', 'AddressController');
+Route::put('/addresses/{id}/status/{status}', 'AddressController@disableOrEnable')->middleware('auth:api');
+Route::get('/addresses/status/{status}', 'AddressController@getAddressesByStatus')->middleware('auth:api');
 Route::middleware('auth:api')->resource('/cards', 'CardController');
 Route::middleware('auth:api')->resource('/banks', 'BankController');
 Route::middleware('auth:api')->resource('/categories', 'CategoryController');

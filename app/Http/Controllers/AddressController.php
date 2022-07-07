@@ -8,6 +8,12 @@ use App\Helpers\Helper;
 
 class AddressController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+
     public function index(Request $request)
     {
         $addresses = Address::where('user_id', $request->user()->id)->get();
@@ -84,4 +90,27 @@ class AddressController extends Controller
         }
         return response()->json($address);
     }
+
+    public function disableOrEnable($id)
+    {
+        $address = Address::find($id);
+        if ($address->status == 1) {
+            $address->status = 0;
+        } else {
+            $address->status = 1;
+        }
+        $address->save();
+        return response()->json($address);
+    }
+
+    public function getAddressesByStatus (Request $request, $status)
+    {
+        $addresses = Address::where('user_id', $request->user()->id)->where('status', $status)->get();
+        foreach ($addresses as $address) {
+            $user = $address->user;
+            $address->user = $user;
+        };
+        return response()->json($addresses);
+    }
+
 }

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Category;
+use App\{ Category, SpecialistService };
 use App\Helpers\Helper;
 use File;
 
@@ -125,5 +125,14 @@ class CategoryController extends Controller
             unlink($file);
         }
         return response()->json($category);
+    }
+
+    // traer solo las categorias que no trabaje el empleado
+    public function getCategoriesNotWorked(Request $request)
+    {
+        $categoriesSpecialist = SpecialistService::where('user_id', $request->user()->id);
+        // traer las categorias que maneja el empleado de specialist_services
+        $categories = Category::whereNotIn('id', $request->categories)->get();
+        return response()->json($categories);
     }
 }
