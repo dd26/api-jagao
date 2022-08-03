@@ -18,8 +18,7 @@ class SpecialistServiceController extends Controller
     {
         $user_id = $request->user()->id;
         $specialist_services = SpecialistService::where('user_id', $user_id)->get();
-        $categories = $specialist_services->groupBy('category_id');
-        return response()->json($categories);
+        return response()->json($specialist_services);
     }
 
     public function specialistServicesByCategory(Request $request, $category_id)
@@ -45,37 +44,16 @@ class SpecialistServiceController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $category_id)
     {
-
-        // stringy to array
-        $subcategoriesArray1 = $request->subcategories;
-        $subcategoriesArray = json_decode($subcategoriesArray1);
-
-        foreach ($subcategoriesArray as $subcategoryItem) {
-            // busco la subcategoria
-            $subcategory = SubCategory::find($subcategoryItem->id);
-            // busco la categoria
-            $category = Category::find($subcategory->category_id);
-            // creo el servicio o actualizo
-
-            $specialistService = new SpecialistService();
-            $specialistService->category_id = $category->id;
-            $specialistService->category_name = $category->name;
-            $specialistService->subcategory_id = $subcategory->id;
-            $specialistService->subcategory_name = $subcategory->name;
-            $specialistService->user_id = $request->user()->id;
-            $specialistService->price = $subcategory->price;
-            $specialistService->has_document = $subcategory->has_document;
-            $specialistService->save();
-
-            // si tiene documento, lo subo
-            if ($subcategory->has_document) {
-                $file = $request['documentFile'.$subcategory->id];
-                $file->move(public_path().'/storage/specialist_services/'.$specialistService->id, $specialistService->id . '.jpeg');
-            }
-        }
-        return response()->json($subcategoriesArray);
+        $category = Category::find($category_id);
+        $specialist_service = new SpecialistService;
+        $specialist_service->category_name = $category->name;
+        $specialist_service->category_id = $category_id;
+        $specialist_service->user_id = $request->user()->id;
+        $specialist_service->has_document = 0;
+        $specialist_service->save();
+        return response()->json($specialist_service);
     }
 
     /**
@@ -118,8 +96,10 @@ class SpecialistServiceController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($category_id)
     {
-        //
+        $specialist_service = SpecialistService::where('category_id', $category_id)->first();
+        $specialist_service->delete();
+        return response()->json($specialist_service);
     }
 }

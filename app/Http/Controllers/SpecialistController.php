@@ -15,6 +15,7 @@ class SpecialistController extends Controller
         foreach ($specialists as $specialist) {
             $user = $specialist->user;
             $specialist->email = $user->email;
+            $specialist->cityName = $specialist->city->name;
             $specialist->actions = array(
                 [
                     'title' => 'Editar',
@@ -30,7 +31,7 @@ class SpecialistController extends Controller
                     'icon' => 'img:vectors/trash1.png',
                 ],
                 [
-                    'title' => 'see details',
+                    'title' => 'Ver Detalles',
                     'url'=> null,
                     'action' => 'seeDetail',
                     'seeDetails' => 'true',
@@ -74,6 +75,8 @@ class SpecialistController extends Controller
         $specialist = Specialist::findOrFail($id);
         $user = $specialist->user;
         $specialist->email = $user->email;
+        $specialist->city;
+        $specialist->services = MasterRequestService::where('employee_id', $user->id)->get();
         return response()->json($specialist);
     }
 
@@ -145,5 +148,16 @@ class SpecialistController extends Controller
         // mostrar decimales
         $amount = number_format($amount, 2, '.', ',');
         return response()->json($amount);
+    }
+
+    public function downloadCv($id)
+    {
+        // download file specialists
+        $path = public_path().'/storage/specialists/'. $id .'/my_cv.pdf';
+        if (file_exists($path)) {
+            return Response::download($path);
+        } else {
+            return response()->json(['message' => 'No existe el archivo'], 404);
+        }
     }
 }

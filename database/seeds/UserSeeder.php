@@ -14,13 +14,25 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('users')->insert(
+        // si ya existe el usuario admin, no se crea
+        if (DB::table('users')->where('email', 'admin@example.com')->count() == 0) {
+            // insert user
+            DB::table('users')->insert([
+                'name' => 'Administrador',
+                'email' => 'admin@example.com',
+                'password' => '123456789',
+                'role_id' => 1,
+            ]);
+        }
+
+
+        /* DB::table('users')->insert(
             [
                 'name' => 'Usuario Prueba',
                 'email' => 'admin@example.com',
                 'password' => '123456789',
                 'role_id' => 1,
             ]
-        );
+        ); */
     }
 }

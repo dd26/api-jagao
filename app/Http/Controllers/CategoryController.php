@@ -131,8 +131,7 @@ class CategoryController extends Controller
     public function getCategoriesNotWorked(Request $request)
     {
         $categoriesSpecialist = SpecialistService::where('user_id', $request->user()->id);
-        // traer las categorias que maneja el empleado de specialist_services
-        $categories = Category::whereNotIn('id', $request->categories)->get();
+        $categories = Category::whereNotIn('id', $categoriesSpecialist->pluck('category_id'))->get();
         return response()->json($categories);
     }
 }

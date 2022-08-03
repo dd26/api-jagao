@@ -36,4 +36,15 @@ class MasterRequestService extends Model
     {
         return $this->belongsTo('App\User');
     }
+
+    public function employee()
+    {
+        return $this->HasOne('App\User', 'id', 'employee_id');
+    }
+
+    // relacion con la calificacion
+    public function rating()
+    {
+        return $this->hasMany('App\Calification');
+    }
 }

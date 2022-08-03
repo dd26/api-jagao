@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use App\Role;
 
 class RolSeeder extends Seeder
 {
@@ -28,10 +29,19 @@ class RolSeeder extends Seeder
                 'slug' => 'customer',
                 'description' => 'Cliente del sistema',
             ],
+            [
+                'name' => 'Soporte',
+                'slug' => 'support',
+                'description' => 'Soporte del sistema en el admin',
+            ],
         ];
         // insert roles
         foreach ($roles as $role) {
-            \App\Role::create($role);
+            // verify if role exists
+            $exists = Role::where('slug', $role['slug'])->first();
+            if (!$exists) {
+                Role::create($role);
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use App\City;
 
 class CitySeeder extends Seeder
 {
@@ -68,7 +69,11 @@ class CitySeeder extends Seeder
 
         ];
         foreach ($cities as $city) {
-            \App\City::create($city);
+            // verify if city exists
+            $exists = City::where('name', $city['name'])->first();
+            if (!$exists) {
+                City::create($city);
+            }
         }
     }
 }

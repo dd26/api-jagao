@@ -2,7 +2,7 @@
 namespace App\Helpers;
 use File;
 
-use App\{ Notification, Coupon, CouponUse, SubCategory };
+use App\{ Notification, Coupon, CouponUse, SubCategory, Card, Payment };
 
 
 
@@ -64,5 +64,43 @@ class Helper {
             $total += $subCategory->price * $service['quantity'];
         }
         return $total;
+    }
+
+    public static function createCharge($card_id, $amount, $master_request_service_id) {
+        $stripe = new \Stripe\StripeClient(env('STRIPE_KEY'));
+        $card = Card::find($card_id);
+        $exp_month = substr($card->expiration_date, 0, 2);
+        $exp_year = substr($card->expiration_date, -2);
+        $exp_year = '20'.$exp_year;
+        try {
+            $token = $stripe->tokens->create([
+                'card' => [
+                    'number' => $card->number,
+                    'exp_month' => $exp_month,
+                    'exp_year' => $exp_year,
+                    'cvc' => $card->cvv,
+                ],
+            ]);
+        } catch (\Stripe\Error\Card $e) {
+            return $e;
+        }
+
+        try {
+            $charge = $stripe->charges->create([
+                'amount' => $amount,
+                'currency' => 'usd',
+                'description' => 'Pago de Servicios JAGAO APP',
+                'source' => $token['id'],
+            ]);
+        } catch (\Stripe\Error\Card $e) {
+            return $e;
+        }
+
+        // save in payment table
+        $payment = new Payment;
+        $payment->master_request_service_id = $master_request_service_id;
+        $payment->stripe_charge_id = $charge['id'];
+        $payment->save();
+        return $charge;
     }
 }

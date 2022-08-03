@@ -28,8 +28,6 @@ class MasterRequestServiceController extends Controller
             $masterRequestService->observations = '';
         }
         $masterRequestService->state = 0;
-        $masterRequestService->discount = $request->discount;
-
         if ($request->discount === 0) { // 0 = apply discount
             $code = $request->coupon;
             $verifyCoupon = Helper::checkCoupon($code);
@@ -49,6 +47,7 @@ class MasterRequestServiceController extends Controller
                 ], 200);
             }
         } else {
+            $masterRequestService->discount = 0;
             $masterRequestService->discount_amount = 0;
         }
 
@@ -64,7 +63,7 @@ class MasterRequestServiceController extends Controller
         $masterRequestService->save();
 
         // save coupon uses
-        if ($masterRequestService->discount === 1) {
+        if ($request->discount === 0) {
             $couponUse = new CouponUse;
             $couponUse->coupon_id = $verifyCoupon->id;
             $couponUse->master_request_service_id = $masterRequestService->id;
@@ -90,7 +89,19 @@ class MasterRequestServiceController extends Controller
 
             $detailRequestService->save();
         }
-        return response()->json(['message' => 'success'], 200);
+
+        try {
+            $total = Helper::getTotalByServices($services);
+            if ($masterRequestService->discount === 1) {
+                $total = $total - $masterRequestService->discount_amount;
+            }
+            Helper::createCharge($masterRequestService->card_id, $total, $masterRequestService->id);
+            return response()->json(['message' => 'success'], 200);
+        }
+        catch (\Exception $e) {
+            $masterRequestService->delete();
+            return response()->json(['error' => true, 'message' => $e->getMessage()], 200);
+        }
     }
 
     public function index(Request $request)
@@ -182,7 +193,18 @@ class MasterRequestServiceController extends Controller
     public function destroy(Request $request, $id)
     {
         $masterRequestService = MasterRequestService::find($id);
-        $masterRequestService->delete();
+        if ($masterRequestService->state > 0) {
+            Helper::generateNotification(
+                $request->user()->name.' has canceled the service.',
+                '',
+                1,
+                $masterRequestService->employee_id,
+                $masterRequestService->id,
+            );
+        }
+        $masterRequestService->state = 404;
+        $masterRequestService->save();
+
         return response()->json(['message' => 'Solicitud de servicio eliminada correctamente'], 200);
     }
 
@@ -213,6 +235,44 @@ class MasterRequestServiceController extends Controller
         }
 
         $masterRequestService->save();
+        return response()->json(['message' => 'Solicitud de servicio actualizada correctamente'], 200);
+    }
+
+    public function updateDateRequest(Request $request, $id)
+    {
+        $masterRequestService = MasterRequestService::find($id);
+        $before = $masterRequestService->date_request;
+        if ($request->right_now === false) {
+            $date = $request->date;
+            $time = $request->time;
+            $dateTime = $date . ' ' . $time;
+            $masterRequestService->date_request = $dateTime;
+            $masterRequestService->right_now = 0;
+        } else {
+            $masterRequestService->date_request = null;
+            $masterRequestService->right_now = 1;
+        }
+        $masterRequestService->save();
+
+        // si el state es mayor a 0, se genera una notificacion para el empleado
+        if ($masterRequestService->state > 0) {
+            // crear un objeto de la fecha anterior y la nueva fecha
+            $dates = [
+                'before' => $before,
+                'after' => $masterRequestService->date_request,
+            ];
+            // convertir el objeto a json string
+            $dates = json_encode($dates);
+
+            Helper::generateNotification(
+                'Customer '.$request->user()->name. ' has changed the service time',
+                $dates,
+                2,
+                $masterRequestService->employee_id,
+                $masterRequestService->id,
+            );
+        }
+
         return response()->json(['message' => 'Solicitud de servicio actualizada correctamente'], 200);
     }
 }

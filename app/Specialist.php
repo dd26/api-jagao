@@ -15,4 +15,9 @@ class Specialist extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
 }

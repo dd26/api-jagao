@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\{Customer, User};
+use App\{Customer, User, MasterRequestService, DetailRequestService};
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 
@@ -16,6 +16,7 @@ class CustomerController extends Controller
      */
     public function index()
     {
+
         $customers = Customer::all();
         foreach ($customers as $customer) {
             $user = $customer->user;
@@ -32,6 +33,13 @@ class CustomerController extends Controller
                     'title' => 'Eliminar',
                     'url'=> null,
                     'action' => 'delete',
+                    'icon' => 'img:vectors/trash1.png',
+                ],
+                [
+                    'title' => 'Ver Detalle',
+                    'url'=> null,
+                    'action' => 'seeDetail',
+                    'seeDetails' => 'true',
                     'icon' => 'img:vectors/trash1.png',
                 ]
             );
@@ -94,6 +102,7 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail($id);
         $user = $customer->user;
         $customer->email = $user->email;
+        $customer->services = MasterRequestService::where('user_id', $user->id)->get();
         return response()->json($customer);
     }
 

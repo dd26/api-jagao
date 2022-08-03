@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Service;
+use App\{ Service, User, MasterRequestService, DetailRequestService, Address };
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 
@@ -17,25 +17,51 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        $services = Service::all();
+        $services = MasterRequestService::all();
         foreach ($services as $service) {
             $service->actions = array(
                 [
-                    'title' => 'Editar',
+                    'title' => 'Ver Detalles',
                     'url'=> null,
-                    'action' => 'edit',
-                    'icon' => 'img:vectors/edit4.png',
-                    'color' => 'primary'
-                ],
-                [
-                    'title' => 'Eliminar',
-                    'url'=> null,
-                    'action' => 'delete',
+                    'action' => 'seeDetail',
+                    'seeDetails' => 'true',
                     'icon' => 'img:vectors/trash1.png',
                 ]
             );
+            $detailRequestServices = $service->detailRequestService;
+            $total = 0;
+            foreach ($detailRequestServices as $detailRequestService) {
+                $total += $detailRequestService->quantity * $detailRequestService->service_price;
+            }
+            $service->total = $total;
+            $service->subservicesCount = $service->detailRequestService->count();
+
+            $serviceState = $service->state;
+            if ($serviceState === 0) {
+                $service->stateName = 'Pendiente';
+            } else if ($serviceState === 1) {
+                $service->stateName = 'En Proceso';
+            } else if ($serviceState === 2) {
+                $service->stateName = 'Finalizado';
+            } else if ($serviceState === 404) {
+                $service->stateName = 'Cancelado';
+            }
+
+            $service->addressName = $service->address->name;
+
         };
         return response()->json($services);
+    }
+
+    public function getImage($id)
+    {
+        $path = public_path().'/storage/categories/'. $id;
+        if (file_exists($path)) {
+            return Response::download($path);
+        } else {
+            $none = public_path().'/avatar4.png';
+            return Response::download($none);
+        }
     }
 
     /**
@@ -79,7 +105,21 @@ class ServiceController extends Controller
      */
     public function show($id)
     {
-        return Service::findOrFail($id);
+        $service = MasterRequestService::findOrFail($id);
+        $service->detailRequestService;
+        $service->address;
+        $service->user->customer;
+        if ($service->employee_id !== null) {
+            $service->employee->specialist;
+        }
+        $service->rating;
+
+        $total = 0;
+        foreach ($service->detailRequestService as $detailRequestService) {
+            $total += $detailRequestService->service_price * $detailRequestService->quantity;
+        }
+        $service->total = $total;
+        return response()->json($service);
     }
 
     /**

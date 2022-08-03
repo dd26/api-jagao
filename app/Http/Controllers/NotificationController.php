@@ -18,7 +18,12 @@ class NotificationController extends Controller
                 $master_request_service = $notification->master_request_service;
                 $employeeId = $master_request_service->employee_id;
                 $employee = Specialist::where('user_id', $employeeId)->first();
+                $customer = Customer::where('user_id', $master_request_service->user_id)->first();
                 $notification->employee = $employee;
+                $notification->customer = $customer;
+                // mandar detalle de los servicios del master request service
+                $notification->detail_request_services = $master_request_service->detailRequestService;
+
             }
         }
         return response()->json($notifications);

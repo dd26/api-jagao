@@ -30,10 +30,12 @@ class UserController extends Controller
 
     public function login(Request $request) {
         $credentials = $request->only('email', 'password');
-        $user = User::where('email', $request->email)->where('password', $request->password)->first();
+        $user = User::where('email', $request->email)->where('password', $request->password)->with('role')->first();
         if ($user) {
             $user->api_token = Str::random(60);
             $user->save();
+            $user->permissions = $user->role->permissions()->get();
+
             return response()->json($user);
         } else {
             return response()->json(['error' => 'Usuario no encontrado'], 401);
@@ -169,81 +171,129 @@ class UserController extends Controller
         }
     }
 
-
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
+    // CRUD USER_ADMIN
+    public function indexAdmin (Request $request) {
+        $users = User::where('role_id', 4)->get();
+        foreach ($users as $item) {
+            if ($item->status === 1) {
+                $item->actionsNew = array(
+                    [
+                        'title' => 'Editar',
+                        'url'=> null,
+                        'action' => 'edit',
+                        'icon' => 'img:vectors/edit4.png',
+                        'color' => 'primary'
+                    ],
+                    [
+                        'title' => 'Eliminar',
+                        'url'=> null,
+                        'action' => 'delete',
+                        'icon' => 'img:vectors/trash1.png',
+                    ],
+                    [
+                        'title' => 'Deshabilitar',
+                        'url'=> null,
+                        'action' => 'changeStatusUserAdm',
+                        'icon' => 'img:vectors/trash1.png',
+                    ]
+                );
+            } else {
+                $item->actionsNew = array(
+                    [
+                        'title' => 'Editar',
+                        'url'=> null,
+                        'action' => 'edit',
+                        'icon' => 'img:vectors/edit4.png',
+                        'color' => 'primary'
+                    ],
+                    [
+                        'title' => 'Eliminar',
+                        'url'=> null,
+                        'action' => 'delete',
+                        'icon' => 'img:vectors/trash1.png',
+                    ],
+                    [
+                        'title' => 'Habilitar',
+                        'url'=> null,
+                        'action' => 'changeStatusUserAdm',
+                        'icon' => 'img:vectors/trash1.png',
+                    ]
+                );
+            }
+        };
+        return response()->json($users);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+    public function updateStatusUserAdm ($id) {
+        $user = User::find($id);
+        if ($user->status == 1) {
+            $user->status = 0;
+        } else {
+            $user->status = 1;
+        }
+        $user->save();
+        return response()->json($user);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+    public function showAdmin (Request $request, $id) {
+        $user = User::find($id);
+        if ($user) {
+            return response()->json($user);
+        } else {
+            return response()->json(['message' => 'Usuario no encontrado'], 402);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
+    public function storeAdmin (Request $request) {
+        $data = $request->only('email', 'password', 'name');
+        $user = User::where('email', $data['email'])->first();
+        if ($user) {
+            return response()->json(['message' => 'El correo ya esta registrado'], 402);
+        } else {
+            $user = new User();
+            $user->name = $data['name'];
+            $user->email = $data['email'];
+            $user->password = $data['password'];
+            $user->role_id = 4;
+            $user->save();
+            return response()->json($user, 201);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+    //destroyAdmin
+    public function destroyAdmin (Request $request, $id) {
+        $user = User::find($id);
+        if ($user) {
+            $user->delete();
+            return response()->json(['message' => 'Usuario eliminado'], 200);
+        } else {
+            return response()->json(['message' => 'Usuario no encontrado'], 402);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
+    //updateAdmin
+    public function updateAdmin (Request $request, $id) {
+        // validar si se cambio el email y validar si ya existe
+        $data = $request->only('email', 'password', 'name');
+        $user = User::find($id);
+        if ($user) {
+            $email = $user->email;
+            // validar email
+            if ($email != $data['email']) {
+                $userValidate = User::where('email', $data['email'])->first();
+                if ($userValidate) {
+                    return response()->json(['message' => 'El correo ya esta registrado'], 402);
+                }
+            }
+            $user->name = $data['name'];
+            $user->email = $data['email'];
+            $user->password = $data['password'];
+            $user->save();
+            return response()->json($user, 200);
+        } else {
+            return response()->json(['message' => 'Usuario no encontrado'], 402);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
+
 }
