@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\{ User, Customer, Specialist, SpecialistService, Category };
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\Helper;
 
 class UserController extends Controller
 {
@@ -176,7 +177,7 @@ class UserController extends Controller
         $users = User::where('role_id', 4)->get();
         foreach ($users as $item) {
             if ($item->status === 1) {
-                $item->actionsNew = array(
+                $item->actions = array(
                     [
                         'title' => 'Editar',
                         'url'=> null,
@@ -194,11 +195,12 @@ class UserController extends Controller
                         'title' => 'Deshabilitar',
                         'url'=> null,
                         'action' => 'changeStatusUserAdm',
-                        'icon' => 'img:vectors/trash1.png',
+                        'icon' => 'lock',
+                        'color' => 'negative'
                     ]
                 );
             } else {
-                $item->actionsNew = array(
+                $item->actions = array(
                     [
                         'title' => 'Editar',
                         'url'=> null,
@@ -216,7 +218,8 @@ class UserController extends Controller
                         'title' => 'Habilitar',
                         'url'=> null,
                         'action' => 'changeStatusUserAdm',
-                        'icon' => 'img:vectors/trash1.png',
+                        'icon' => 'lock_open',
+                        'color' => 'positive'
                     ]
                 );
             }
@@ -256,6 +259,14 @@ class UserController extends Controller
             $user->password = $data['password'];
             $user->role_id = 4;
             $user->save();
+
+
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $file = $request->image;
+                $file->move(public_path().'/storage/users_admin/'.$user->id, $user->id . '.jpeg');
+            }
+
             return response()->json($user, 201);
         }
     }
@@ -265,6 +276,8 @@ class UserController extends Controller
         $user = User::find($id);
         if ($user) {
             $user->delete();
+            // llamo al helper para eliminar un archivo
+            Helper::deleteFile($user->id.'.jpeg', 'users_admin/'.$user->id);
             return response()->json(['message' => 'Usuario eliminado'], 200);
         } else {
             return response()->json(['message' => 'Usuario no encontrado'], 402);
