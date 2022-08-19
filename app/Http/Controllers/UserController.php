@@ -11,6 +11,14 @@ use App\Helpers\Helper;
 class UserController extends Controller
 {
 
+    public function verifiedUser (Request $request, $id)
+    {
+        $user = User::find($id);
+        $user->verified = true;
+        $user->save();
+        return response()->json($user);
+    }
+
     public function verifyToken (Request $request)
     {
         $user = User::where('api_token', $request->api_token)->first();
@@ -164,6 +172,7 @@ class UserController extends Controller
         if ($user->role_id == 2) {
             $specialist = Specialist::where('user_id', $user->id)->first();
             $specialist->user = $user;
+            $specialist->specialistServices = $user->specialistServices;
             return response()->json($specialist);
         } else if ($user->role_id == 3) {
             $customer = Customer::where('user_id', $user->id)->first();
@@ -178,6 +187,13 @@ class UserController extends Controller
         foreach ($users as $item) {
             if ($item->status === 1) {
                 $item->actions = array(
+                    [
+                        'title' => 'Ver Detalles',
+                        'url'=> null,
+                        'action' => 'seeDetail',
+                        'icon' => 'img:vectors/show1.svg',
+                        'color' => 'primary'
+                    ],
                     [
                         'title' => 'Editar',
                         'url'=> null,
@@ -196,11 +212,19 @@ class UserController extends Controller
                         'url'=> null,
                         'action' => 'changeStatusUserAdm',
                         'icon' => 'lock',
-                        'color' => 'negative'
+                        'color' => 'negative',
+                        'type' => 'toggle'
                     ]
                 );
             } else {
                 $item->actions = array(
+                    [
+                        'title' => 'Ver Detalles',
+                        'url'=> null,
+                        'action' => 'seeDetail',
+                        'icon' => 'img:vectors/show1.svg',
+                        'color' => 'primary'
+                    ],
                     [
                         'title' => 'Editar',
                         'url'=> null,
@@ -219,7 +243,8 @@ class UserController extends Controller
                         'url'=> null,
                         'action' => 'changeStatusUserAdm',
                         'icon' => 'lock_open',
-                        'color' => 'positive'
+                        'color' => 'positive',
+                        'type' => 'toggle'
                     ]
                 );
             }

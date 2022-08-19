@@ -43,7 +43,9 @@ Route::get('/addresses/status/{status}', 'AddressController@getAddressesByStatus
 Route::middleware('auth:api')->resource('/cards', 'CardController');
 Route::middleware('auth:api')->resource('/banks', 'BankController');
 Route::middleware('auth:api')->resource('/categories', 'CategoryController');
+Route::put('/categories/{id}/status_change/', 'CategoryController@disableOrEnable')->middleware('auth:api');
 Route::get('categories/specialist/not_worked', 'CategoryController@getCategoriesNotWorked')->middleware('auth:api');
+Route::get('categories_actives', 'CategoryController@getCategoriesActives')->middleware('auth:api');
 
 Route::middleware('auth:api')->resource('/coupons', 'CouponController');
 Route::put('/coupons/{id}/status/{status}', 'CouponController@updateStatus')->middleware('auth:api');
@@ -59,6 +61,7 @@ Route::get('/specialist_services/category/{category_id}', 'SpecialistServiceCont
 Route::post('/specialist_services/category/{category_id}', 'SpecialistServiceController@store')->middleware('auth:api');
 
 Route::put('/users/change_status', 'UserController@changeStatus')->middleware('auth:api');
+Route::put('/users/verified/user/{id}', 'UserController@verifiedUser')->middleware('auth:api');
 
 Route::post('/master_request_services', 'MasterRequestServiceController@store')->middleware('auth:api');
 Route::get('/master_request_services', 'MasterRequestServiceController@index')->middleware('auth:api');
@@ -94,3 +97,6 @@ Route::get('/image_two/{folder}/{name}', 'UploadController@getImageTwo');
 Route::post('/image/{folder}/{id}', 'UploadController@changeImage');
 
 Route::post('test_stripe', 'PaymentController@pruebasPagosStripe');
+
+// prueba send mail
+Route::get('/send_mail', 'MailController@sendMail');

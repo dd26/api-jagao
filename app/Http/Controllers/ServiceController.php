@@ -24,10 +24,10 @@ class ServiceController extends Controller
                     'title' => 'Ver Detalles',
                     'url'=> null,
                     'action' => 'seeDetail',
-                    'seeDetails' => 'true',
-                    'icon' => 'img:vectors/trash1.png',
+                    'icon' => 'img:vectors/show1.svg',
                 ]
             );
+            $service->rating;
             $detailRequestServices = $service->detailRequestService;
             $total = 0;
             foreach ($detailRequestServices as $detailRequestService) {

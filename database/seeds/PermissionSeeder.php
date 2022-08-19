@@ -50,7 +50,7 @@ class PermissionSeeder extends Seeder
                 'role_id' => 1,
             ],
             [
-                'name' => 'module-cupons',
+                'name' => 'module-coupons-admin',
                 'description' => 'Acceso a los módulos de cupones',
                 'slug' => 'module-cupons-admin',
                 'role_id' => 1,

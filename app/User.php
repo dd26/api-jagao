@@ -55,4 +55,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Customer::class, 'user_id', 'id');
     }
+
+    // relacion con specialist_services
+    public function specialistServices()
+    {
+        return $this->hasMany(SpecialistService::class, 'user_id', 'id');
+    }
 }

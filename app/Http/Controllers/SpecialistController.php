@@ -16,6 +16,7 @@ class SpecialistController extends Controller
             $user = $specialist->user;
             $specialist->email = $user->email;
             $specialist->cityName = $specialist->city->name;
+            $specialist->verified = $user->verified;
             $specialist->actions = array(
                 [
                     'title' => 'Editar',

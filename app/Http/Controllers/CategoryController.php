@@ -18,21 +18,57 @@ class CategoryController extends Controller
     {
         $categories = Category::all();
         foreach ($categories as $item) {
-            $item->actions = array(
-                [
-                    'title' => 'Editar',
-                    'url'=> null,
-                    'action' => 'edit',
-                    'icon' => 'img:vectors/edit4.png',
-                    'color' => 'primary'
-                ],
-                [
-                    'title' => 'Eliminar',
-                    'url'=> null,
-                    'action' => 'delete',
-                    'icon' => 'img:vectors/trash1.png',
-                ]
-            );
+            if ($item->status === 1) {
+                $item->actions = array(
+                    [
+                        'title' => 'Editar',
+                        'url'=> null,
+                        'action' => 'edit',
+                        'icon' => 'img:vectors/edit4.png',
+                        'color' => 'primary'
+                    ],
+                    [
+                        'title' => 'Eliminar',
+                        'url'=> null,
+                        'action' => 'delete',
+                        'icon' => 'img:vectors/trash1.png',
+                    ],
+                    [
+                        'title' => 'Deshabilitar',
+                        'url'=> null,
+                        'action' => 'changeStatus',
+                        'vueEmit' => true,
+                        'icon' => 'lock',
+                        'color' => 'negative',
+                        'type' => 'toggle'
+                    ]
+                );
+            } else {
+                $item->actions = array(
+                    [
+                        'title' => 'Editar',
+                        'url'=> null,
+                        'action' => 'edit',
+                        'icon' => 'img:vectors/edit4.png',
+                        'color' => 'primary'
+                    ],
+                    [
+                        'title' => 'Eliminar',
+                        'url'=> null,
+                        'action' => 'delete',
+                        'icon' => 'img:vectors/trash1.png',
+                    ],
+                    [
+                        'title' => 'Habilitar',
+                        'url'=> null,
+                        'action' => 'changeStatus',
+                        'vueEmit' => true,
+                        'icon' => 'lock',
+                        'color' => 'positive',
+                        'type' => 'toggle'
+                    ]
+                );
+            }
         };
         return response()->json($categories);
     }
@@ -131,7 +167,27 @@ class CategoryController extends Controller
     public function getCategoriesNotWorked(Request $request)
     {
         $categoriesSpecialist = SpecialistService::where('user_id', $request->user()->id);
-        $categories = Category::whereNotIn('id', $categoriesSpecialist->pluck('category_id'))->get();
+        $categories = Category::where('status', 1)->whereNotIn('id', $categoriesSpecialist->pluck('category_id'))->get();
+        return response()->json($categories);
+    }
+
+    // disableOrEnable
+    public function disableOrEnable(Request $request, $id)
+    {
+        $category = Category::findOrFail($id);
+        if ($category->status === 1) {
+            $category->status = 0;
+        } else {
+            $category->status = 1;
+        }
+        $category->save();
+        return response()->json($category);
+    }
+
+    //getCategoriesActives
+    public function getCategoriesActives()
+    {
+        $categories = Category::where('status', 1)->get();
         return response()->json($categories);
     }
 }

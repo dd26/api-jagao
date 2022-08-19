@@ -254,14 +254,11 @@ class MasterRequestServiceController extends Controller
         }
         $masterRequestService->save();
 
-        // si el state es mayor a 0, se genera una notificacion para el empleado
         if ($masterRequestService->state > 0) {
-            // crear un objeto de la fecha anterior y la nueva fecha
             $dates = [
                 'before' => $before,
                 'after' => $masterRequestService->date_request,
             ];
-            // convertir el objeto a json string
             $dates = json_encode($dates);
 
             Helper::generateNotification(
@@ -275,4 +272,5 @@ class MasterRequestServiceController extends Controller
 
         return response()->json(['message' => 'Solicitud de servicio actualizada correctamente'], 200);
     }
+
 }
