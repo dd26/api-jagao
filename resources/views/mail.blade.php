@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title> Prueba</title>
+        <title>Jagao - Recuperar Contraseña</title>
     </head>
     <body>
-        Haidee Martinez Has recibido una cantidad de 500 USDT, disponibles por tu cuenta de Binance. <br>
-        Enviados por EICHE. <br>
-        <a href="https://binance.com/">Click aqui para ver su balance</a>
+        <h1>Recuperar Contraseña</h1>
+        <p>
+            Hola {{ $name }}, has solicitado recuperar tu contraseña.
+        </p>
+        <p>
+            Su codigo de recuperacion es: <b style="font-size: 15px; font-weight: bold"> {{ $code }} </b>
+        </p>
     </body>
 </html>

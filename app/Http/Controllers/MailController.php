@@ -5,7 +5,10 @@ ini_set('max_execution_time', '9999999999');
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+
 use App\Mail\TestMail;
+use App\User;
 
 class MailController extends Controller
 {
@@ -16,10 +19,32 @@ class MailController extends Controller
             'name' => 'Binance Pay',
             'email' => 'denilsson.d.sousa@gmail.com',
             'message' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quisquam, quidem, temporibus, nisi, facere, soluta. Quidem, quisquam, temporibus, nisi, facere, soluta.',
-            'subject' => 'Lorem ipsum dolor sit amet ASUNTO',
+            'subject' => 'ASUNTO',
         ];
         Mail::to('denilsson.d.sousa@gmail.com')->send(new TestMail($data));
 
     }
 
+    public function sendMailRecuperatePassword (Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+            $code = Str::random(5);
+            $data = [
+                'name' => $user->name,
+                'code' => $code,
+                'email' => $user->email,
+                'subject' => 'Recuperar contraseña - Jagao',
+            ];
+
+            $user->recuperatePasswords()->create([
+                'code' => $code,
+            ]);
+            Mail::to($user->email)->send(new TestMail($data));
+            return response()->json(['message' => 'Se ha enviado un email a ' . $user->email], 200);
+        } else {
+            return response()->json(['error' => 'El usuario no existe']);
+        }
+
+    }
 }
