@@ -59,7 +59,7 @@ class MailController extends Controller
             $recuperatePassword->delete();
             return response()->json(['message' => 'Se ha cambiado la contraseña correctamente'], 200);
         } else {
-            return response()->json(['error' => 'El código no existe'], 404);
+            return response()->json(['error' => 'El código no es valido'], 200);
         }
     }
 
