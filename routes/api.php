@@ -101,3 +101,4 @@ Route::post('test_stripe', 'PaymentController@pruebasPagosStripe');
 // prueba send mail
 Route::get('/send_mail', 'MailController@sendMail');
 Route::post('/recuperate_pass', 'MailController@sendMailRecuperatePassword');
+Route::post('/change_password', 'MailController@changePassword');

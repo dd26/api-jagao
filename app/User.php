@@ -67,4 +67,5 @@ class User extends Authenticatable
     {
         return $this->hasMany(RecuperatePassword::class, 'user_id', 'id');
     }
+
 }
