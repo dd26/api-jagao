@@ -62,4 +62,38 @@ class MailController extends Controller
             return response()->json(['error' => 'El código no existe'], 404);
         }
     }
+
+    public function sendMailRecuperatePasswordApp (Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+            // generar codigo de numeros aleatorios de 4 digitos
+            $code = rand(1000, 9999);
+            $data = [
+                'name' => $user->name,
+                'code' => $code,
+                'email' => $user->email,
+                'subject' => 'Recuperate password - Jagao',
+            ];
+
+            $user->recuperatePasswords()->create([
+                'code' => $code,
+            ]);
+            Mail::to($user->email)->send(new TestMail($data));
+            return response()->json(['message' => 'Se ha enviado un email a ' . $user->email], 200);
+        } else {
+            return response()->json(['error' => 'El usuario no existe']);
+        }
+    }
+
+    // verify code
+    public function verifyCode ($code)
+    {
+        $recuperatePassword = RecuperatePassword::where('code', $code)->first();
+        if ($recuperatePassword) {
+            return response()->json(['message' => 'El código es correcto'], 200);
+        } else {
+            return response()->json(['error' => 'the code is not valid'], 200);
+        }
+    }
 }
