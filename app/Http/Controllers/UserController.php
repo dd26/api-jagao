@@ -55,6 +55,10 @@ class UserController extends Controller
     public function loginApp (Request $request) {
         $credentials = $request->only('email', 'password');
         $user = User::where('email', $request->email)->where('password', $request->password)->first();
+        // si el status es 3 es porque el usuario esta eliminado
+        if ($user && $user['status'] == 3) {
+            return response()->json(['error' => 'Usuario eliminado'], 401);
+        }
         if ($user && ($user['role_id'] == 2 || $user['role_id'] == 3)) {
             $user->api_token = Str::random(60);
             $user->save();
@@ -331,6 +335,14 @@ class UserController extends Controller
         } else {
             return response()->json(['message' => 'Usuario no encontrado'], 402);
         }
+    }
+
+    // eliminar el usuario logueado, es decir solo se cambia el status a 3
+    public function changeStatusInDelete (Request $request) {
+        $user = $request->user();
+        $user->status = 3;
+        $user->save();
+        return response()->json(['message' => 'Usuario eliminado'], 200);
     }
 
 

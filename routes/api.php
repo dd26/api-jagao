@@ -22,6 +22,9 @@ Route::post('/login_app', 'UserController@loginApp');
 Route::post('/mail_verify', 'UserController@mailVerify');
 Route::post('/users', 'UserController@storeApp');
 
+// eliminar el usuario logueado
+Route::put('/users/logged/status/deleted', 'UserController@changeStatusInDelete')->middleware('auth:api');
+
 Route::post('/verify_token', 'UserController@verifyToken');
 
 Route::middleware('auth:api')->resource('/services', 'ServiceController');
@@ -45,7 +48,7 @@ Route::middleware('auth:api')->resource('/banks', 'BankController');
 Route::middleware('auth:api')->resource('/categories', 'CategoryController');
 Route::put('/categories/{id}/status_change/', 'CategoryController@disableOrEnable')->middleware('auth:api');
 Route::get('categories/specialist/not_worked', 'CategoryController@getCategoriesNotWorked')->middleware('auth:api');
-Route::get('categories_actives', 'CategoryController@getCategoriesActives')->middleware('auth:api');
+Route::get('categories_actives', 'CategoryController@getCategoriesActives');
 
 Route::middleware('auth:api')->resource('/coupons', 'CouponController');
 Route::put('/coupons/{id}/status/{status}', 'CouponController@updateStatus')->middleware('auth:api');
