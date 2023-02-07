@@ -55,7 +55,7 @@ Route::put('/coupons/{id}/status/{status}', 'CouponController@updateStatus')->mi
 Route::get('/coupons/check/code/{code}', 'CouponController@checkCouponByCode')->middleware('auth:api');
 
 Route::middleware('auth:api')->resource('/subcategories', 'SubCategoryController');
-Route::get('/subcategories_by_category_id/{id}', 'SubCategoryController@subcategoriesByCategoryId')->middleware('auth:api');
+Route::get('/subcategories_by_category_id/{id}', 'SubCategoryController@subcategoriesByCategoryId');
 
 // Route::post('/specialist_services', 'SpecialistServiceController@store')->middleware('auth:api');
 Route::get('/specialist_services', 'SpecialistServiceController@index')->middleware('auth:api');
