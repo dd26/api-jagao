@@ -103,6 +103,8 @@ Route::post('test_stripe', 'PaymentController@pruebasPagosStripe');
 
 // prueba send mail
 Route::get('/send_mail', 'MailController@sendMail');
+// enviar email de bienvenida para los que estan en proceso de registro
+Route::post('/send_mail_welcome', 'MailController@sendMailWelcome');
 Route::post('/recuperate_pass', 'MailController@sendMailRecuperatePassword');
 Route::post('/recuperate_pass_app', 'MailController@sendMailRecuperatePasswordApp');
 Route::post('/change_password', 'MailController@changePassword');

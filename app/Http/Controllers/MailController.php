@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 use App\Mail\TestMail;
+use App\Mail\WelcomeMail;
 use App\User;
 use App\RecuperatePassword;
 
@@ -24,6 +25,21 @@ class MailController extends Controller
         ];
         Mail::to('denilsson.d.sousa@gmail.com')->send(new TestMail($data));
 
+    }
+
+    // funcion para mandar mail de bienvenida, donde recibe solo el email
+    // esto es para los usuarios que estan en proceso de registro en el app
+    // asi que no tienen un usuario en la base de datos, por lo tanto se enviara
+    // un mail de bienvenida solamente con el email
+    public function sendMailWelcome (Request $request)
+    {
+        $data = [
+            'name' => 'Welcome',
+            'email' => $request->email,
+            'message' => 'Welcome to Jagao',
+            'subject' => 'Welcome',
+        ];
+        Mail::to($request->email)->send(new WelcomeMail($data));
     }
 
     public function sendMailRecuperatePassword (Request $request)
