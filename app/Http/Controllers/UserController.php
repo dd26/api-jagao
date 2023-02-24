@@ -8,6 +8,10 @@ use App\{ User, Customer, Specialist, SpecialistService, Category };
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\Helper;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WaitEmployeeMail;
+
+
 class UserController extends Controller
 {
 
@@ -119,6 +123,14 @@ class UserController extends Controller
             $specialistService->price = 0;
             $specialistService->has_document = 0;
             $specialistService->save();
+
+            $data = [
+                'name' => 'Welcome',
+                'email' => $request->email,
+                'message' => 'Wait for the verification of your account by the administrator',
+                'subject' => 'Wait',
+            ];
+            Mail::to($request->email)->send(new WaitEmployeeMail($data));
         } else {
             $customer = new Customer();
             $customer->userName = $data['userName'];
