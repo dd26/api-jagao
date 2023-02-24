@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 
 use App\Mail\TestMail;
 use App\Mail\WelcomeMail;
+use App\Mail\WaitEmployeeMail;
 use App\User;
 use App\RecuperatePassword;
 
@@ -40,6 +41,19 @@ class MailController extends Controller
             'subject' => 'Welcome',
         ];
         Mail::to($request->email)->send(new WelcomeMail($data));
+    }
+
+    // funcion para enviar mail al empleado, como indicacion que espere la
+    // verificacion de su cuenta por parte del administrador
+    public function sendMailWaitEmployee (Request $request)
+    {
+        $data = [
+            'name' => 'Name Wait',
+            'email' => $request->email,
+            'message' => 'Wait for the verification of your account by the administrator',
+            'subject' => 'Wait',
+        ];
+        Mail::to($request->email)->send(new WaitEmployeeMail($data));
     }
 
     public function sendMailRecuperatePassword (Request $request)
