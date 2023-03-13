@@ -10,6 +10,7 @@ use App\Helpers\Helper;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WaitEmployeeMail;
+use App\Mail\VerifiedEmployee;
 
 
 class UserController extends Controller
@@ -20,6 +21,15 @@ class UserController extends Controller
         $user = User::find($id);
         $user->verified = true;
         $user->save();
+        // enviar correo de bienvenida que ya esta verificado
+        $data = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'message' => 'Your account has been verified',
+            'subject' => 'Verified',
+        ];
+        // se envia el correo de bienvenida
+        Mail::to($user->email)->send(new VerifiedEmployee($data));
         return response()->json($user);
     }
 
