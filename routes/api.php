@@ -39,6 +39,8 @@ Route::get('/specialist_by_user_id/{id}', 'SpecialistController@specialistByUser
 Route::put('/specialists/profile/{id}', 'SpecialistController@profileUpdate')->middleware('auth:api');
 Route::get('/specialists/amount/total', 'SpecialistController@getAmountFinish')->middleware('auth:api');
 Route::post('/download_cv/{id}', 'SpecialistController@downloadCv');
+// ruta para cambiar a bloqueado el usuario especialista, recibe id del usuario
+Route::put('/specialists/status/blocked/{id_user}', 'SpecialistController@changeStatusInBlocked')->middleware('auth:api');
 
 Route::middleware('auth:api')->resource('/addresses', 'AddressController');
 Route::put('/addresses/{id}/status/{status}', 'AddressController@disableOrEnable')->middleware('auth:api');

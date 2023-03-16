@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 
 class SpecialistController extends Controller
 {
+
     public function index()
     {
         $specialists = Specialist::all();
@@ -17,28 +18,76 @@ class SpecialistController extends Controller
             $specialist->email = $user->email;
             $specialist->cityName = $specialist->city->name;
             $specialist->verified = $user->verified;
-            $specialist->actions = array(
-                [
-                    'title' => 'Editar',
-                    'url'=> null,
-                    'action' => 'edit',
-                    'icon' => 'img:vectors/edit4.png',
-                    'color' => 'primary'
-                ],
-                [
-                    'title' => 'Eliminar',
-                    'url'=> null,
-                    'action' => 'delete',
-                    'icon' => 'img:vectors/trash1.png',
-                ],
-                [
-                    'title' => 'Ver Detalles',
-                    'url'=> null,
-                    'action' => 'seeDetail',
-                    'seeDetails' => 'true',
-                    'icon' => 'img:vectors/trash1.png',
-                ]
-            );
+            $specialist->isBlocked = $user->isBlocked;
+            if ($specialist->user->isBlocked) {
+                $specialist->actions = array(
+                    [
+                        'title' => 'Editar',
+                        'url'=> null,
+                        'action' => 'edit',
+                        'icon' => 'img:vectors/edit4.png',
+                        'color' => 'primary'
+                    ],
+                    [
+                        'title' => 'Eliminar',
+                        'url'=> null,
+                        'action' => 'delete',
+                        'icon' => 'img:vectors/trash1.png',
+                    ],
+                    [
+                        'title' => '',
+                        'url'=> null,
+                        'action' => 'changeStatusDynamic',
+                        'vueEmit' => true,
+                        'icon' => 'lock',
+                        'color' => 'negative',
+                        'type' => 'toggleDynamic',
+                        'field' => 'isBlocked',
+                        'value' => 0
+                    ],
+                    [
+                        'title' => 'Ver Detalles',
+                        'url'=> null,
+                        'action' => 'seeDetail',
+                        'seeDetails' => 'true',
+                        'icon' => 'img:vectors/trash1.png',
+                    ]
+                );
+            } else {
+                $specialist->actions = array(
+                    [
+                        'title' => 'Editar',
+                        'url'=> null,
+                        'action' => 'edit',
+                        'icon' => 'img:vectors/edit4.png',
+                        'color' => 'primary'
+                    ],
+                    [
+                        'title' => 'Eliminar',
+                        'url'=> null,
+                        'action' => 'delete',
+                        'icon' => 'img:vectors/trash1.png',
+                    ],
+                    [
+                        'title' => '',
+                        'url'=> null,
+                        'action' => 'changeStatusDynamic',
+                        'vueEmit' => true,
+                        'icon' => 'lock',
+                        'color' => 'negative',
+                        'type' => 'toggleDynamic',
+                        'field' => 'isBlocked',
+                        'value' => 1
+                    ],
+                    [
+                        'title' => 'Ver Detalles',
+                        'url'=> null,
+                        'action' => 'seeDetail',
+                        'seeDetails' => 'true',
+                        'icon' => 'img:vectors/trash1.png',
+                    ],
+                );
+            }
         };
         return response()->json($specialists);
     }
@@ -160,5 +209,13 @@ class SpecialistController extends Controller
         } else {
             return response()->json(['message' => 'No existe el archivo'], 404);
         }
+    }
+
+    public function changeStatusInBlocked (Request $request, $id_user)
+    {
+        $user = User::findOrFail($id_user);
+        $user->isBlocked = $request->input('isBlocked');
+        $user->save();
+        return response()->json($user);
     }
 }
