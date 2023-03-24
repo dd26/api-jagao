@@ -73,6 +73,15 @@ class UserController extends Controller
         if ($user && $user['status'] == 3) {
             return response()->json(['error' => 'Usuario eliminado'], 401);
         }
+
+        // la propiedad isBlocked es 1 cuando el usuario esta bloqueado
+        if ($user && $user['isBlocked'] == 1) {
+            return response()->json([
+                'error' => 'Usuario bloqueado',
+                'message' => 'Your account has been blocked, please contact the administrator'
+            ], 403);
+        }
+
         if ($user && ($user['role_id'] == 2 || $user['role_id'] == 3)) {
             $user->api_token = Str::random(60);
             $user->save();
