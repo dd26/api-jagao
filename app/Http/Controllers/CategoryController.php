@@ -187,7 +187,7 @@ class CategoryController extends Controller
     //getCategoriesActives
     public function getCategoriesActives()
     {
-        $categories = Category::where('status', 1)->get();
+        $categories = Category::where('status', 1)->with(['subcategories'])->get();
         return response()->json($categories);
     }
 }

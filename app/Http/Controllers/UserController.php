@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\{ User, Customer, Specialist, SpecialistService, Category };
+use App\{ User, Customer, Specialist, SpecialistService, Category, RoleChangeRequest };
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\Helper;
 
@@ -85,6 +85,19 @@ class UserController extends Controller
         if ($user && ($user['role_id'] == 2 || $user['role_id'] == 3)) {
             $user->api_token = Str::random(60);
             $user->save();
+
+            $user->load(['userTypes']);
+
+            // si active role es 3 es por es customer
+            if ($user['role_id'] == 3) {
+                $user->load(['customer.city']);
+            }
+
+            // si active role es 2 es por es specialist
+            if ($user['role_id'] == 2) {
+                $user->load(['specialist']);
+            }
+
             return response()->json($user);
         } else {
             return response()->json(['error' => 'Usuario no encontrado'], 401);
@@ -212,6 +225,10 @@ class UserController extends Controller
         } else if ($user->role_id == 3) {
             $customer = Customer::where('user_id', $user->id)->first();
             $customer->user = $user;
+
+            // verificar la ultima solicitud de cambio de rol
+            $lastRequest = RoleChangeRequest::where('user_id', $user->id)->orderBy('created_at', 'desc')->first();
+            $customer->lastRequest = $lastRequest;
             return response()->json($customer);
         }
     }

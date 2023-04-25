@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\{Customer, User, MasterRequestService, DetailRequestService};
+use App\{Customer, User, MasterRequestService, DetailRequestService, UserType, RoleChangeRequest};
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 
@@ -81,6 +81,9 @@ class CustomerController extends Controller
         $customer->address = $request->input('address');
         $customer->user_id = $user->id;
         $customer->save();
+
+        $userType = new UserType(['type' => 'customer']);
+        $user->userTypes()->save($userType);
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -182,5 +185,53 @@ class CustomerController extends Controller
         $user->save();
 
         return response()->json($customer, 200);
+    }
+
+    public function customerToSpecialist (Request $request) {
+        // Validación de la solicitud
+        /* $request->validate([
+            'categories' => 'required|array',
+            'resume' => 'required|mimes:pdf',
+            'identity_document' => 'required|mimes:pdf,jpeg,png',
+        ]); */
+
+        // Almacenamiento de archivos en el sistema de archivos (ejemplo utilizando el disco 'public')
+        $userId = $request->user()->id;
+        $resumeFileName = 'resume_' . time() . '.' . $request->resume->getClientOriginalExtension();
+        $identityDocumentFileName = 'identity_document_' . time() . '.' . $request->identity_document->getClientOriginalExtension();
+
+        $storagePath = 'public/storage/change_request_role_to_specialist/' . $userId;
+
+        if ($request->hasFile('resume')) {
+            $file = $request->file('resume');
+            $file = $request->resume;
+            // guardar imagen
+            $file->move(public_path().'/storage/change_request_role_to_specialist/'.$userId, $resumeFileName);
+        }
+
+        if ($request->hasFile('identity_document')) {
+            $file = $request->file('identity_document');
+            $file = $request->identity_document;
+            // guardar imagen
+            $file->move(public_path().'/storage/change_request_role_to_specialist/'.$userId, $identityDocumentFileName);
+        }
+
+        $resumeFilePath = $storagePath . '/' . $resumeFileName;
+        $identityDocumentFilePath = $storagePath . '/' . $identityDocumentFileName;
+
+        // Creación de la nueva entrada en la tabla role_change_requests
+        $roleChangeRequest = new RoleChangeRequest([
+            'user_id' => $userId,
+            'categories' => json_encode($request->categories),
+            'resume' => $resumeFilePath,
+            'identity_document' => $identityDocumentFilePath
+        ]);
+
+        $roleChangeRequest->save();
+
+        return response()->json([
+            'message' => 'Solicitud enviada correctamente',
+            'request' => $roleChangeRequest
+        ], 200);
     }
 }

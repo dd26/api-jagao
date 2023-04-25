@@ -16,4 +16,10 @@ class Customer extends Model
         return $this->belongsTo(User::class);
     }
 
+    // relacion con city_id para obtener el nombre de la ciudad
+    public function city()
+    {
+        return $this->hasOne(City::class, 'id', 'city_id');
+    }
+
 }

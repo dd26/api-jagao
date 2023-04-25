@@ -10,6 +10,13 @@ class Category extends Model
         'name'
     ];
 
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        return asset("storage/categories/{$this->id}/{$this->id}.jpeg");
+    }
+
     public function subcategories()
     {
         return $this->hasMany('App\SubCategory');

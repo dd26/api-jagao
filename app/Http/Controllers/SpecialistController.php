@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\{Specialist, User, MasterRequestService, DetailRequestService};
+use App\{Specialist, User, MasterRequestService, DetailRequestService, UserType};
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 
@@ -110,6 +110,9 @@ class SpecialistController extends Controller
         $specialist->address = $request->input('address');
         $specialist->user_id = $user->id;
         $specialist->save();
+
+        $userType = new UserType(['type' => 'specialist']);
+        $user->userTypes()->save($userType);
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');

@@ -33,6 +33,8 @@ Route::get('services/image/{id}', 'ServiceController@getImage');
 Route::middleware('auth:api')->resource('/customers', 'CustomerController');
 Route::put('/customers/profile/{id}', 'CustomerController@profileUpdate')->middleware('auth:api');
 Route::get('/customer_by_user_id/{id}', 'CustomerController@customerByUserId')->middleware('auth:api');
+// ruta para recibir los datos del cliente que quiere un cambio de rol a especialista
+Route::post('/customer_to_specialist', 'CustomerController@customerToSpecialist')->middleware('auth:api');
 
 Route::middleware('auth:api')->resource('/specialists', 'SpecialistController');
 Route::get('/specialist_by_user_id/{id}', 'SpecialistController@specialistByUserId')->middleware('auth:api');
