@@ -56,7 +56,8 @@ class BankController extends Controller
      */
     public function show($id)
     {
-        //
+        $bank = Bank::find($id);
+        return response()->json($bank);
     }
 
     /**
@@ -79,7 +80,14 @@ class BankController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $bank = Bank::find($id);
+        $bank->exterior_bank_id = $request->bank;
+        $bank->account_number = $request->accountNumber;
+        $bank->account_type = $request->accountType;
+        $bank->full_name = $request->fullName;
+        $bank->route_number = $request->routeNumber;
+        $bank->save();
+        return response()->json($bank);
     }
 
     /**

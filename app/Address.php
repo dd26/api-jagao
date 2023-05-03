@@ -11,7 +11,9 @@ class Address extends Model
         'name',
         'city_id',
         'address',
-        'postal_code'
+        'postal_code',
+        'latitude',
+        'longitude',
     ];
 
     public function user()

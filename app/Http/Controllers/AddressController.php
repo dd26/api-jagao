@@ -48,6 +48,8 @@ class AddressController extends Controller
         $address->city_id = request('city_id');
         $address->address = request('address');
         $address->postal_code = request('postalCode');
+        $address->latitude = request('latitude');
+        $address->longitude = request('longitude');
         $address->save();
 
         if ($request->hasFile('image')) {

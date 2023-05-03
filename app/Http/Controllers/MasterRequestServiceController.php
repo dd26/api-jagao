@@ -123,7 +123,9 @@ class MasterRequestServiceController extends Controller
     public function indexByStatus(Request $request, $status)
     {
         $user = $request->user();
-        $masterRequestServices = MasterRequestService::where('state', $status)->get();
+        $masterRequestServices = MasterRequestService::where('state', $status)
+                                    ->orderBy('created_at', 'desc')
+                                    ->get();
         foreach ($masterRequestServices as $masterRequestService) {
             $masterRequestService->address_name = $masterRequestService->address->name;
             $total = 0;
@@ -134,6 +136,7 @@ class MasterRequestServiceController extends Controller
         }
         return response()->json($masterRequestServices, 200);
     }
+
 
     public function indexByStatusAndCustomer(Request $request, $status)
     {
