@@ -71,6 +71,9 @@ class SubCategoryController extends Controller
         $subcategory->description = $request->description;
         $subcategory->has_document = $request->has_document;
         $subcategory->price = $request->price;
+        $subcategory->comision_is_porcentage = $request->comision_is_porcentage;
+        $subcategory->comision_app = $request->comision_app;
+        $subcategory->comision_espcialist = $request->comision_espcialist;
         $subcategory->save();
 
         if ($request->hasFile('image')) {
@@ -113,12 +116,15 @@ class SubCategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $subcategory = SubCategory::find($id);
+        $subcategory = SubCategory::where('id',$id)->first();
         $subcategory->name = $request->name;
         $subcategory->category_id = $request->category_id;
         $subcategory->description = $request->description;
         $subcategory->has_document = $request->has_document;
         $subcategory->price = $request->price;
+        $subcategory->comision_is_porcentage = $request->comision_is_porcentage;
+        $subcategory->comision_app = $request->comision_app;
+        $subcategory->comision_espcialist = $request->comision_espcialist;
         $subcategory->save();
 
         if ($request->hasFile('image')) {

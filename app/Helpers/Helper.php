@@ -1,6 +1,7 @@
 <?php
 namespace App\Helpers;
 use File;
+use Illuminate\Support\Facades\Log;
 
 use App\{ Notification, Coupon, CouponUse, SubCategory, Card, Payment };
 
@@ -60,8 +61,12 @@ class Helper {
     public static function getTotalByServices($services) {
         $total = 0;
         foreach ($services as $service) {
-            $subCategory = SubCategory::find($service['id']);
-            $total += $subCategory->price * $service['quantity'];
+            $subCategory = SubCategory::where('id', $service['id'])->first();
+            if($subCategory->comision_is_porcentage === 1){
+                $total += ($subCategory->price * ($subCategory->comision_espcialist / 100) ) * $service['quantity'];
+            }else{
+                $total += ($subCategory->price + $subCategory->comision_espcialist + $subCategory->comision_app)* $service['quantity'];
+            }
         }
         return $total;
     }
@@ -84,7 +89,7 @@ class Helper {
         } catch (\Stripe\Error\Card $e) {
             return $e;
         }
-
+        $amount = (number_format($amount, 2, '.', '') * 100);
         try {
             $charge = $stripe->charges->create([
                 'amount' => $amount,

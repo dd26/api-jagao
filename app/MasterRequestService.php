@@ -19,7 +19,8 @@ class MasterRequestService extends Model
         'state',
         'discount',
         'discount_amount',
-        'date_request'
+        'date_request',
+        'fee'
     ];
 
     public function address()

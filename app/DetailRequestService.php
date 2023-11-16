@@ -13,6 +13,9 @@ class DetailRequestService extends Model
         'service_name',
         'service_description',
         'service_price',
+        'comision_app',
+        'comision_espcialist',
+        'comision_is_porcentage',
         'quantity'
     ];
 

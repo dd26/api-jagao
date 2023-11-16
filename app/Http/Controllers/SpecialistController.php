@@ -195,7 +195,11 @@ class SpecialistController extends Controller
         foreach ($masterRequestService as $masterRequest) {
             $detailRequestService = $masterRequest->detailRequestService;
             foreach ($detailRequestService as $detailRequest) {
-                $amount += $detailRequest->service_price * $detailRequest->quantity;
+                if($detailRequest->comision_is_porcentage){
+                    $amount += ($detailRequest->service_price * ($detailRequest->comision_espcialist / 100) ) * $detailRequest->quantity;
+                }else{
+                    $amount += $detailRequest->comision_espcialist * $detailRequest->quantity;
+                }
             }
         }
         // mostrar decimales

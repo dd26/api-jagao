@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\{ Card, MasterRequestService, DetailRequestService, Address, Category, SubCategory, Specialist, Notification, Customer, User, Coupon, CouponUse };
 use App\Helpers\Helper;
+use Illuminate\Support\Facades\Log;
 
 class MasterRequestServiceController extends Controller
 {
@@ -21,6 +22,7 @@ class MasterRequestServiceController extends Controller
         $category = Category::find($request->category_id);
         $masterRequestService->category_id = $category->id;
         $masterRequestService->category_name = $category->name;
+        $masterRequestService->fee = floatval(env('FEE'));
 
         if ($request->observations) {
             $masterRequestService->observations = $request->observations;
@@ -85,6 +87,9 @@ class MasterRequestServiceController extends Controller
 
             $subCategory = SubCategory::find($service['id']);
             $detailRequestService->service_price = $subCategory->price;
+            $detailRequestService->comision_app = $subCategory->comision_app;
+            $detailRequestService->comision_espcialist = $subCategory->comision_espcialist;
+            $detailRequestService->comision_is_porcentage = $subCategory->comision_is_porcentage;
             $detailRequestService->quantity = $service['quantity'];
 
             $detailRequestService->save();
@@ -92,15 +97,16 @@ class MasterRequestServiceController extends Controller
 
         try {
             $total = Helper::getTotalByServices($services);
+            $total = $total + (float) env('FEE');
             if ($masterRequestService->discount === 1) {
                 $total = $total - $masterRequestService->discount_amount;
             }
             Helper::createCharge($masterRequestService->card_id, $total, $masterRequestService->id);
-            return response()->json(['message' => 'success'], 200);
+            return response()->json(['message' => 'success', 'total' => $total], 200);
         }
         catch (\Exception $e) {
             $masterRequestService->delete();
-            return response()->json(['error' => true, 'message' => $e->getMessage()], 200);
+            return response()->json(['error' => true, 'message' => $e->getMessage(), 'total' => $total], 200);
         }
     }
 
@@ -112,8 +118,13 @@ class MasterRequestServiceController extends Controller
             $masterRequestService->address_name = $masterRequestService->address->name;
             $total = 0;
             foreach ($masterRequestService->detailRequestService as $detailRequestService) {
-                $total += $detailRequestService->service_price * $detailRequestService->quantity;
+                if($detailRequestService->comision_is_porcentage){
+                    $total += $detailRequestService->service_price * $detailRequestService->quantity;
+                }else{
+                    $total += ($detailRequestService->service_price + $detailRequestService->comision_espcialist + $detailRequestService->comision_app)* $detailRequestService->quantity;
+                }
             }
+            $total = $total + $masterRequestService->fee;
             $masterRequestService->total = $total;
         }
         return response()->json($masterRequestServices, 200);
@@ -130,8 +141,13 @@ class MasterRequestServiceController extends Controller
             $masterRequestService->address_name = $masterRequestService->address->name;
             $total = 0;
             foreach ($masterRequestService->detailRequestService as $detailRequestService) {
-                $total += $detailRequestService->service_price * $detailRequestService->quantity;
+                if($detailRequestService->comision_is_porcentage){
+                    $total += ($detailRequestService->service_price * ($detailRequestService->comision_espcialist / 100) ) * $detailRequestService->quantity;
+                }else{
+                    $total += ($detailRequestService->comision_espcialist)* $detailRequestService->quantity;
+                }
             }
+
             $masterRequestService->total = $total;
         }
         return response()->json($masterRequestServices, 200);
@@ -146,8 +162,13 @@ class MasterRequestServiceController extends Controller
             $masterRequestService->address_name = $masterRequestService->address->name;
             $total = 0;
             foreach ($masterRequestService->detailRequestService as $detailRequestService) {
-                $total += $detailRequestService->service_price * $detailRequestService->quantity;
+                if($detailRequestService->comision_is_porcentage){
+                    $total += $detailRequestService->service_price * $detailRequestService->quantity;
+                }else{
+                    $total += ($detailRequestService->service_price + $detailRequestService->comision_espcialist + $detailRequestService->comision_app)* $detailRequestService->quantity;
+                }
             }
+            $total = $total + $masterRequestService->fee;
             $masterRequestService->total = $total;
         }
         return response()->json($masterRequestServices, 200);
@@ -161,7 +182,11 @@ class MasterRequestServiceController extends Controller
             $masterRequestService->address_name = $masterRequestService->address->name;
             $total = 0;
             foreach ($masterRequestService->detailRequestService as $detailRequestService) {
-                $total += $detailRequestService->service_price * $detailRequestService->quantity;
+                if($detailRequestService->comision_is_porcentage){
+                    $total += ($detailRequestService->service_price * ($detailRequestService->comision_espcialist / 100) ) * $detailRequestService->quantity;
+                }else{
+                    $total += $detailRequestService->comision_espcialist * $detailRequestService->quantity;
+                }
             }
             $masterRequestService->total = $total;
         }
@@ -175,7 +200,30 @@ class MasterRequestServiceController extends Controller
         $masterRequestService->address_name = $masterRequestService->address->name;
         $total = 0;
         foreach ($masterRequestService->detailRequestService as $detailRequestService) {
-            $total += $detailRequestService->service_price * $detailRequestService->quantity;
+            if ($request->filled('type')) {
+                if($request->type == 'employee'){
+                    if($detailRequestService->comision_is_porcentage){
+                        $total += ($detailRequestService->service_price * ($detailRequestService->comision_espcialist / 100) ) * $detailRequestService->quantity;
+                    }else{
+                        $total += $detailRequestService->comision_espcialist * $detailRequestService->quantity;
+                    }
+                }else if($request->type == 'customer'){
+                    if($detailRequestService->comision_is_porcentage){
+                        $total += $detailRequestService->service_price * $detailRequestService->quantity;
+                    }else{
+                        $total += ($detailRequestService->service_price + $detailRequestService->comision_espcialist + $detailRequestService->comision_app)* $detailRequestService->quantity;
+                    }
+                }else{
+                    $total += $detailRequestService->service_price * $detailRequestService->quantity;
+                }
+            }else{
+                $total += $detailRequestService->service_price * $detailRequestService->quantity;
+            }
+        }
+        if ($request->filled('type')) {
+            if($request->type == 'customer'){
+                $total +=  floatval(env('FEE'));
+            }
         }
         $masterRequestService->total = $total;
         $masterRequestService->user = $masterRequestService->user;

@@ -98,6 +98,8 @@ class UserController extends Controller
                 $user->load(['specialist']);
             }
 
+            $user['fee'] = floatval(env('FEE'));
+
             return response()->json($user);
         } else {
             return response()->json(['error' => 'Usuario no encontrado'], 401);
@@ -221,6 +223,7 @@ class UserController extends Controller
             $specialist = Specialist::where('user_id', $user->id)->first();
             $specialist->user = $user;
             $specialist->specialistServices = $user->specialistServices;
+            $specialist['fee'] = floatval(env('FEE'));
             return response()->json($specialist);
         } else if ($user->role_id == 3) {
             $customer = Customer::where('user_id', $user->id)->first();
@@ -229,6 +232,7 @@ class UserController extends Controller
             // verificar la ultima solicitud de cambio de rol
             $lastRequest = RoleChangeRequest::where('user_id', $user->id)->orderBy('created_at', 'desc')->first();
             $customer->lastRequest = $lastRequest;
+            $customer['fee'] = floatval(env('FEE'));
             return response()->json($customer);
         }
     }

@@ -9,7 +9,12 @@ class SubCategory extends Model
     protected $table = 'subcategories';
 
     protected $fillable = [
-        'name', 'category_id', 'description', 'has_document'
+        'name', 'category_id', 'description', 'has_document', 'price','comision_is_porcentage', 'comision_app', 'comision_espcialist'
+    ];
+
+    protected $casts = [
+        'comision_is_porcentage' => 'boolean',
+        'has_document' => 'boolean',
     ];
 
     protected $appends = ['image_url'];
