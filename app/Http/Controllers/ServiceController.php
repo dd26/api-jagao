@@ -163,4 +163,11 @@ class ServiceController extends Controller
         $service->delete();
         return $service;
     }
+
+    public function getFee()
+    {
+        return response()->json([
+            'fee' => floatval(env('FEE'))
+        ]);
+    }
 }

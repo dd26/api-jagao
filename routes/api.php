@@ -29,6 +29,7 @@ Route::post('/verify_token', 'UserController@verifyToken');
 
 Route::middleware('auth:api')->resource('/services', 'ServiceController');
 Route::get('services/image/{id}', 'ServiceController@getImage');
+Route::get('fee', 'ServiceController@getFee');
 
 Route::middleware('auth:api')->resource('/customers', 'CustomerController');
 Route::put('/customers/profile/{id}', 'CustomerController@profileUpdate')->middleware('auth:api');
