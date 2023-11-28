@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CategoryResource;
 use Illuminate\Http\Request;
 use App\{ Category, SpecialistService };
 use App\Helpers\Helper;
@@ -17,60 +18,8 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::all();
-        foreach ($categories as $item) {
-            if ($item->status === 1) {
-                $item->actions = array(
-                    [
-                        'title' => 'Editar',
-                        'url'=> null,
-                        'action' => 'edit',
-                        'icon' => 'img:vectors/edit4.png',
-                        'color' => 'primary'
-                    ],
-                    [
-                        'title' => 'Eliminar',
-                        'url'=> null,
-                        'action' => 'delete',
-                        'icon' => 'img:vectors/trash1.png',
-                    ],
-                    [
-                        'title' => 'Deshabilitar',
-                        'url'=> null,
-                        'action' => 'changeStatus',
-                        'vueEmit' => true,
-                        'icon' => 'lock',
-                        'color' => 'negative',
-                        'type' => 'toggle'
-                    ]
-                );
-            } else {
-                $item->actions = array(
-                    [
-                        'title' => 'Editar',
-                        'url'=> null,
-                        'action' => 'edit',
-                        'icon' => 'img:vectors/edit4.png',
-                        'color' => 'primary'
-                    ],
-                    [
-                        'title' => 'Eliminar',
-                        'url'=> null,
-                        'action' => 'delete',
-                        'icon' => 'img:vectors/trash1.png',
-                    ],
-                    [
-                        'title' => 'Habilitar',
-                        'url'=> null,
-                        'action' => 'changeStatus',
-                        'vueEmit' => true,
-                        'icon' => 'lock',
-                        'color' => 'positive',
-                        'type' => 'toggle'
-                    ]
-                );
-            }
-        };
-        return response()->json($categories);
+
+        return response()->json(CategoryResource::collection($categories));
     }
 
     /**
@@ -93,6 +42,7 @@ class CategoryController extends Controller
     {
         $category = new Category;
         $category->name = $request->name;
+        $category->parent_id = $request->parent_id;
         $category->save();
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -108,10 +58,9 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Category $category)
     {
-        $category = Category::find($id);
-        return response()->json($category);
+        return response()->json(new CategoryResource($category));
     }
 
     /**
@@ -136,6 +85,7 @@ class CategoryController extends Controller
     {
         $category = Category::find($id);
         $category->name = $request->name;
+        $category->parent_id = $request->parent_id;
         $category->save();
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -168,7 +118,7 @@ class CategoryController extends Controller
     {
         $categoriesSpecialist = SpecialistService::where('user_id', $request->user()->id);
         $categories = Category::where('status', 1)->whereNotIn('id', $categoriesSpecialist->pluck('category_id'))->get();
-        return response()->json($categories);
+        return response()->json(CategoryResource::collection($categories));
     }
 
     // disableOrEnable
@@ -188,6 +138,6 @@ class CategoryController extends Controller
     public function getCategoriesActives()
     {
         $categories = Category::where('status', 1)->with(['subcategories'])->get();
-        return response()->json($categories);
+        return response()->json(CategoryResource::collection($categories));
     }
 }
