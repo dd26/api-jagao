@@ -42,7 +42,12 @@ class CategoryController extends Controller
     {
         $category = new Category;
         $category->name = $request->name;
-        $category->parent_id = $request->parent_id;
+        if($request->filled('parent_id'))
+        {
+            if($request->parent_id !== 'null' && $request->parent_id !== null){
+                $category->parent_id = $request->parent_id;
+            }
+        }
         $category->save();
         if ($request->hasFile('image')) {
             $file = $request->file('image');
